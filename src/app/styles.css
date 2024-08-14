@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body {
+    @apply bg-base-200;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-base-100;
+  }
+
+  .dropdown-content {
+    @apply z-10;
+  }
+
+  .table.table-sm th,
+  .table.table-xs th {
+    @apply py-4;
+  }
+
+  .modal-backdrop {
+    @apply border-none outline-none;
+  }
+}
