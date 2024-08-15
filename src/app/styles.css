@@ -5,7 +5,13 @@
 @layer base {
   html,
   body {
-    @apply bg-base-200;
+    @apply bg-base-200 overflow-hidden;
+  }
+}
+
+@layer utilities {
+  .container {
+    @apply max-w-5xl;
   }
 }
 

@@ -1,48 +1,59 @@
 import {
   createContext,
+  memo,
   PropsWithChildren,
+  useCallback,
   useContext,
   useEffect,
   useState,
 } from "react";
 
 type PageContextValues = {
-  title?: string | null;
-  setTitle: (title?: string | null) => void;
+  title: string | null;
+  prev: string | null;
 };
 
-export const PageContext = createContext<PageContextValues | null>(null);
+export const PageContext = createContext<
+  | (PageContextValues & {
+      setValue: (values: Partial<PageContextValues>) => void;
+    })
+  | null
+>(null);
+
+const initialValues: PageContextValues = {
+  title: null,
+  prev: null,
+};
 
 export const PageContextProvider = ({ children }: PropsWithChildren) => {
-  const [title, setTitle] = useState<PageContextValues["title"]>(null);
+  const [values, setValues] = useState<PageContextValues>(initialValues);
 
-  const contextValues = {
-    title,
-    setTitle,
-  };
+  const setValue = useCallback((value: Partial<PageContextValues>) => {
+    setValues((prev) => ({ ...prev, ...value }));
+  }, []);
 
-  return <PageContext.Provider children={children} value={contextValues} />;
+  return (
+    <PageContext.Provider children={children} value={{ ...values, setValue }} />
+  );
 };
 
-type PageProps = {
-  title?: string;
-};
+type PageProps = Partial<PageContextValues>;
 
-const Page = ({ title }: PageProps) => {
+const Page = memo((props: PageProps) => {
   const context = useContext(PageContext);
   if (!context) {
     throw new Error("Page component must be used within a PageContextProvider");
   }
 
   useEffect(() => {
-    context.setTitle(title);
+    context.setValue(props);
 
     return () => {
-      context.setTitle(null);
+      context.setValue(initialValues);
     };
-  }, [title, context.setTitle]);
+  }, [props, context.setValue]);
 
   return null;
-};
+});
 
 export default Page;

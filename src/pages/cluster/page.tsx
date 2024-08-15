@@ -7,7 +7,7 @@ const ClusterPage = () => {
   const { data } = useClusterStatus();
 
   return (
-    <div>
+    <div className="container">
       <Page title="Cluster" />
 
       <Card>

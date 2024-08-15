@@ -1,8 +1,9 @@
 import { PageContext } from "@/context/page-context";
-import { useContext } from "react";
-import { Link, Outlet } from "react-router-dom";
-import { Menu } from "react-daisyui";
-import { HardDrive, LayoutDashboard } from "lucide-react";
+import { Suspense, useContext } from "react";
+import { Outlet, useNavigate } from "react-router-dom";
+import Sidebar from "../containers/sidebar";
+import { ArrowLeft } from "lucide-react";
+import Button from "../ui/button";
 
 const MainLayout = () => {
   return (
@@ -13,50 +14,33 @@ const MainLayout = () => {
         <Header />
 
         <main className="flex-1 overflow-y-auto p-4 md:p-8">
-          <div className="container max-w-5xl">
+          <Suspense>
             <Outlet />
-          </div>
+          </Suspense>
         </main>
       </div>
     </div>
   );
 };
 
-const Sidebar = () => {
-  return (
-    <aside className="bg-base-100 border-r border-base-300/30 w-[220px] overflow-y-auto">
-      <div className="p-4">
-        <img
-          src="https://garagehq.deuxfleurs.fr/images/garage-logo.svg"
-          alt="logo"
-          className="w-full max-w-[100px] mx-auto"
-        />
-        <p className="text-sm font-medium text-center">WebUI</p>
-      </div>
-      <Menu className="gap-y-1">
-        <Menu.Item>
-          <Link to="/">
-            <LayoutDashboard />
-            <p>Dashboard</p>
-          </Link>
-        </Menu.Item>
-        <Menu.Item>
-          <Link to="/cluster">
-            <HardDrive />
-            <p>Cluster</p>
-          </Link>
-        </Menu.Item>
-      </Menu>
-    </aside>
-  );
-};
-
 const Header = () => {
   const page = useContext(PageContext);
+  const navigate = useNavigate();
 
   return (
-    <header className="bg-base-100 p-4 md:p-8 md:py-6 flex flex-row items-center gap-4">
-      <h1 className="text-2xl font-medium">{page?.title || "Dashboard"}</h1>
+    <header className="bg-base-100 px-4 h-16 md:px-8 md:h-20 flex flex-row items-center gap-4">
+      {page?.prev ? (
+        <Button
+          href={page.prev}
+          onClick={() => navigate(page.prev!, { replace: true })}
+          color="ghost"
+          shape="circle"
+          className="-ml-4"
+        >
+          <ArrowLeft />
+        </Button>
+      ) : null}
+      <h1 className="text-xl">{page?.title || "Dashboard"}</h1>
     </header>
   );
 };

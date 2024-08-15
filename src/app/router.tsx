@@ -1,8 +1,12 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { lazy } from "react";
 import AuthLayout from "@/components/layouts/auth-layout";
 import MainLayout from "@/components/layouts/main-layout";
-import ClusterPage from "@/pages/cluster/page";
-import HomePage from "@/pages/home/page";
+
+const ClusterPage = lazy(() => import("@/pages/cluster/page"));
+const HomePage = lazy(() => import("@/pages/home/page"));
+const BucketsPage = lazy(() => import("@/pages/buckets/page"));
+const ManageBucketPage = lazy(() => import("@/pages/buckets/manage/page"));
 
 const router = createBrowserRouter([
   {
@@ -20,6 +24,13 @@ const router = createBrowserRouter([
       {
         path: "cluster",
         Component: ClusterPage,
+      },
+      {
+        path: "buckets",
+        children: [
+          { index: true, Component: BucketsPage },
+          { path: ":id", Component: ManageBucketPage },
+        ],
       },
     ],
   },

@@ -17,7 +17,7 @@ const HomePage = () => {
   const { data: health } = useNodesHealth();
 
   return (
-    <div>
+    <div className="container">
       <Page title="Dashboard" />
 
       <section className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
@@ -27,7 +27,11 @@ const HomePage = () => {
           value={ucfirst(health?.status)}
           valueClassName={cn(
             "text-lg",
-            health?.status === "healthy" ? "text-success" : "text-error"
+            health?.status === "healthy"
+              ? "text-success"
+              : health?.status === "degraded"
+              ? "text-warning"
+              : "text-error"
           )}
         />
         <StatsCard title="Nodes" icon={HardDrive} value={health?.knownNodes} />

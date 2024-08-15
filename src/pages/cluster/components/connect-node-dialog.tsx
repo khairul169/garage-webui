@@ -7,6 +7,7 @@ import { ConnectNodeSchema, connectNodeSchema } from "../schema";
 import { useCallback, useRef } from "react";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
+import { Plug } from "lucide-react";
 
 const ConnectNodeDialog = () => {
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -45,6 +46,7 @@ const ConnectNodeDialog = () => {
   return (
     <>
       <Button color="primary" onClick={handleShow}>
+        <Plug />
         Connect
       </Button>
 
@@ -58,7 +60,7 @@ const ConnectNodeDialog = () => {
           <Modal.Header>Connect Node</Modal.Header>
           <Modal.Body>
             <p>Run this command to get node id:</p>
-            <Code className="mt-2">docker exec -it garage /garage node id</Code>
+            <Code className="mt-2">docker exec garage /garage node id</Code>
 
             <p className="mt-8">Enter node id:</p>
             <Input
