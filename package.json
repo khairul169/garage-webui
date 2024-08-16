@@ -1,13 +1,15 @@
 {
   "name": "garage-webui",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev:client": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "dev:server": "cd backend && npm run dev",
+    "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\""
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
@@ -32,6 +34,7 @@
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react-swc": "^3.5.0",
     "autoprefixer": "^10.4.20",
+    "concurrently": "^8.2.2",
     "daisyui": "^4.12.10",
     "eslint": "^9.8.0",
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",

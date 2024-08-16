@@ -3,7 +3,9 @@
   "module": "main.ts",
   "type": "module",
   "scripts": {
-    "dev": "bun --watch main.ts"
+    "dev": "bun --watch main.ts",
+    "build": "bun build main.ts --minify --sourcemap --outdir ./dist",
+    "start": "NODE_ENV=production bun run ./dist/main.js"
   },
   "devDependencies": {
     "@types/bun": "latest"

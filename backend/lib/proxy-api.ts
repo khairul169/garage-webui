@@ -3,7 +3,8 @@ import { API_ADMIN_KEY, API_BASE_URL } from "./api";
 
 export const proxyApi = async (c: Context) => {
   const url = new URL(c.req.url);
-  const reqUrl = new URL(API_BASE_URL + url.pathname + url.search);
+  const pathname = url.pathname.replace(/\/api\//, "/");
+  const reqUrl = new URL(API_BASE_URL + pathname + url.search);
 
   try {
     const headers = c.req.raw.headers;

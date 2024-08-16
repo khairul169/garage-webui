@@ -11,6 +11,7 @@ import { Link, useLocation } from "react-router-dom";
 import Button from "../ui/button";
 import { themes } from "@/app/themes";
 import appStore from "@/stores/app-store";
+import garageLogo from "@/assets/garage-logo.svg";
 
 const pages = [
   { icon: LayoutDashboard, title: "Dashboard", path: "/", exact: true },
@@ -26,7 +27,7 @@ const Sidebar = () => {
     <aside className="bg-base-100 border-r border-base-300/30 w-[80%] md:w-[250px] flex flex-col items-stretch overflow-hidden h-full">
       <div className="p-4">
         <img
-          src="https://garagehq.deuxfleurs.fr/images/garage-logo.svg"
+          src={garageLogo}
           alt="logo"
           className="w-full max-w-[100px] mx-auto"
         />

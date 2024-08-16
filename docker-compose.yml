@@ -1,0 +1,21 @@
+services:
+  garage:
+    image: dxflrs/garage:v1.0.0
+    container_name: garage
+    volumes:
+      - ./garage.toml:/etc/garage.toml
+      - ./meta:/var/lib/garage/meta
+      - ./data:/var/lib/garage/data
+    restart: unless-stopped
+    network_mode: host
+
+  webui:
+    image: khairul169/garage-webui:latest
+    container_name: garage-webui
+    restart: unless-stopped
+    environment:
+      - CONFIG_PATH=/etc/garage.toml
+    volumes:
+      - ./garage.toml:/etc/garage.toml
+    ports:
+      - 3909:3909

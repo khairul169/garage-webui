@@ -14,6 +14,9 @@ importers:
       toml:
         specifier: ^3.0.0
         version: 3.0.0
+      typescript:
+        specifier: ^5.0.0
+        version: 5.5.4
     devDependencies:
       '@types/bun':
         specifier: latest
@@ -40,6 +43,11 @@ packages:
   toml@3.0.0:
     resolution: {integrity: sha512-y/mWCZinnvxjTKYhJ+pYxwD0mRLVvOtdS2Awbgxln6iEnt4rk0yBxeSBHkGJcPucRiG0e55mwWp+g/05rsrd6w==}
 
+  typescript@5.5.4:
+    resolution: {integrity: sha512-Mtq29sKDAEYP7aljRgtPOpTvOfbwRWlS6dPRzwjdE+C0R4brX/GUyhHSecbHMFLNBLcJIPt9nl9yG5TZ1weH+Q==}
+    engines: {node: '>=14.17'}
+    hasBin: true
+
   undici-types@5.26.5:
     resolution: {integrity: sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==}
 
@@ -65,5 +73,7 @@ snapshots:
   hono@4.5.5: {}
 
   toml@3.0.0: {}
+
+  typescript@5.5.4: {}
 
   undici-types@5.26.5: {}
