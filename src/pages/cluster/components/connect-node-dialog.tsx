@@ -59,7 +59,7 @@ const ConnectNodeDialog = () => {
         >
           <Modal.Header>Connect Node</Modal.Header>
           <Modal.Body>
-            <p>Run this command to get node id:</p>
+            <p>Run this command in your target node to get node id:</p>
             <Code className="mt-2">docker exec garage /garage node id</Code>
 
             <p className="mt-8">Enter node id:</p>
