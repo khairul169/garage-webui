@@ -29,7 +29,9 @@ const api = {
     });
 
     if (!res.ok) {
-      throw new Error(res.statusText);
+      const json = await res.json().catch(() => {});
+      const message = json?.message || res.statusText;
+      throw new Error(message);
     }
 
     const isJson = res.headers

@@ -14,8 +14,7 @@ export const readableBytes = (bytes?: number | null, divider = 1024) => {
   if (bytes == null || Number.isNaN(bytes)) return "n/a";
 
   const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
-  if (bytes === 0) return "n/a";
-  const i = Math.floor(Math.log(bytes) / Math.log(divider));
+  const i = Math.max(0, Math.floor(Math.log(bytes) / Math.log(divider)));
 
   return `${(bytes / Math.pow(divider, i)).toFixed(1)} ${sizes[i]}`;
 };

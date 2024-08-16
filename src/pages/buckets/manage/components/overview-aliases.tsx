@@ -4,7 +4,7 @@ import Chips from "@/components/ui/chips";
 import { Bucket } from "../../types";
 
 type Props = {
-  data: Bucket;
+  data?: Bucket;
 };
 
 const AliasesSection = ({ data }: Props) => {

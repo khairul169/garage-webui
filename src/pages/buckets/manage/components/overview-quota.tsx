@@ -9,7 +9,7 @@ import { useUpdateBucket } from "../hooks";
 import { Bucket } from "../../types";
 
 type Props = {
-  data: Bucket;
+  data?: Bucket;
 };
 
 const QuotaSection = ({ data }: Props) => {

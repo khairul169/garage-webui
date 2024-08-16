@@ -12,7 +12,7 @@ import Button from "@/components/ui/button";
 import { Bucket } from "../../types";
 
 type Props = {
-  data: Bucket;
+  data?: Bucket;
 };
 
 const WebsiteAccessSection = ({ data }: Props) => {

@@ -1,4 +1,4 @@
-import {
+import React, {
   createContext,
   memo,
   PropsWithChildren,
@@ -11,6 +11,7 @@ import {
 type PageContextValues = {
   title: string | null;
   prev: string | null;
+  actions: React.ReactNode | null;
 };
 
 export const PageContext = createContext<
@@ -23,6 +24,7 @@ export const PageContext = createContext<
 const initialValues: PageContextValues = {
   title: null,
   prev: null,
+  actions: null,
 };
 
 export const PageContextProvider = ({ children }: PropsWithChildren) => {

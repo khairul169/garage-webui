@@ -12,8 +12,8 @@ const OverviewTab = () => {
   const { data } = useBucket(id);
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8">
-      <Card className="card-body gap-0 items-start">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8 items-start">
+      <Card className="card-body gap-0 items-start order-2 md:order-1">
         <Card.Title>Summary</Card.Title>
 
         <AliasesSection data={data} />
@@ -21,7 +21,7 @@ const OverviewTab = () => {
         <QuotaSection data={data} />
       </Card>
 
-      <Card className="card-body">
+      <Card className="card-body order-1 md:order-2">
         <Card.Title>Usage</Card.Title>
 
         <div className="grid grid-cols-2 gap-4 mt-4">

@@ -40,7 +40,10 @@ const Header = () => {
           <ArrowLeft />
         </Button>
       ) : null}
-      <h1 className="text-xl">{page?.title || "Dashboard"}</h1>
+
+      <h1 className="text-xl flex-1 truncate">{page?.title || "Dashboard"}</h1>
+
+      {page?.actions}
     </header>
   );
 };
