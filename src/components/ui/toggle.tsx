@@ -42,7 +42,13 @@ export const ToggleField = <T extends FieldValues>({
       title={title}
       className={className}
       render={(field) => (
-        <Toggle {...props} {...field} className={inputClassName} />
+        <Toggle
+          {...props}
+          {...field}
+          className={inputClassName}
+          checked={field.value || false}
+          onChange={(e) => field.onChange(e.target.checked)}
+        />
       )}
     />
   );

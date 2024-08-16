@@ -45,7 +45,7 @@ const Sidebar = () => {
                 className={cn(
                   "h-12 flex items-center px-6",
                   isActive &&
-                    "bg-primary text-primary-content hover:bg-primary/60 focus:bg-primary"
+                    "bg-primary text-primary-content hover:bg-primary/60 focus:bg-primary focus:text-primary-content"
                 )}
               >
                 <page.icon size={18} />

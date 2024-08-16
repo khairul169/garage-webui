@@ -22,3 +22,12 @@ export const readableBytes = (bytes?: number | null, divider = 1024) => {
 export const handleError = (err: unknown) => {
   toast.error((err as Error)?.message || "Unknown error");
 };
+
+export const copyToClipboard = async (text: string) => {
+  try {
+    await navigator.clipboard.writeText(text);
+    toast.success("Copied to clipboard");
+  } catch (err) {
+    handleError(err);
+  }
+};

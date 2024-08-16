@@ -45,29 +45,33 @@ const Header = ({ onSidebarOpen }: HeaderProps) => {
   const navigate = useNavigate();
 
   return (
-    <header className="bg-base-100 px-4 h-16 md:px-8 md:h-20 flex flex-row items-center gap-4">
-      {page?.prev ? (
-        <Button
-          href={page.prev}
-          onClick={() => navigate(page.prev!, { replace: true })}
-          color="ghost"
-          shape="circle"
-          className="-mx-2"
-        >
-          <ArrowLeft />
-        </Button>
-      ) : (
-        <Button
-          icon={MenuIcon}
-          color="ghost"
-          className="md:hidden -mx-2"
-          onClick={onSidebarOpen}
-        />
-      )}
+    <header className="bg-base-100 px-4 md:px-8">
+      <div className="container h-16 md:h-20 flex flex-row items-center gap-4">
+        {page?.prev ? (
+          <Button
+            href={page.prev}
+            onClick={() => navigate(page.prev!, { replace: true })}
+            color="ghost"
+            shape="circle"
+            className="-mx-2"
+          >
+            <ArrowLeft />
+          </Button>
+        ) : (
+          <Button
+            icon={MenuIcon}
+            color="ghost"
+            className="md:hidden -mx-2"
+            onClick={onSidebarOpen}
+          />
+        )}
 
-      <h1 className="text-xl flex-1 truncate">{page?.title || "Dashboard"}</h1>
+        <h1 className="text-xl flex-1 truncate">
+          {page?.title || "Dashboard"}
+        </h1>
 
-      {page?.actions}
+        {page?.actions}
+      </div>
     </header>
   );
 };

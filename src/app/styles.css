@@ -20,6 +20,10 @@
     @apply bg-base-100;
   }
 
+  .card-body {
+    @apply p-4 md:p-8;
+  }
+
   .dropdown-content {
     @apply z-10;
   }
