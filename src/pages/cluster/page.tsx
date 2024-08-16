@@ -41,7 +41,7 @@ type DetailItemProps = {
 const DetailItem = ({ title, value }: DetailItemProps) => {
   return (
     <div className="flex flex-row items-start max-w-xl gap-3 text-left text-sm">
-      <div className="shrink-0 w-[200px]">
+      <div className="shrink-0 w-1/3 max-w-[200px]">
         <p className="text-base-content/80">{title}</p>
       </div>
       <div className="flex-1 truncate">

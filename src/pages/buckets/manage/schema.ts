@@ -1,5 +1,11 @@
 import { z } from "zod";
 
+export const addAliasSchema = z.object({
+  alias: z.string().min(1, "Alias is required"),
+});
+
+export type AddAliasSchema = z.infer<typeof addAliasSchema>;
+
 export const websiteConfigSchema = z.object({
   websiteAccess: z.boolean(),
   websiteConfig: z

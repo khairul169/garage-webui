@@ -128,7 +128,7 @@ const NodesList = ({ nodes }: NodeListProps) => {
 
   return (
     <>
-      <div className="flex flex-row items-center my-2 gap-4">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center my-2 gap-x-4 gap-y-2">
         <Input
           placeholder="Search..."
           value={filter.search}
@@ -185,7 +185,7 @@ const NodesList = ({ nodes }: NodeListProps) => {
       ) : null}
 
       <div className="w-full overflow-x-auto min-h-[400px] pb-16">
-        <Table size="sm">
+        <Table size="sm" className="min-w-[800px]">
           <Table.Head>
             <span>#</span>
             <span>ID</span>

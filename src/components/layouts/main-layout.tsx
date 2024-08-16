@@ -1,29 +1,46 @@
 import { PageContext } from "@/context/page-context";
-import { Suspense, useContext } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Suspense, useContext, useEffect } from "react";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import Sidebar from "../containers/sidebar";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, MenuIcon } from "lucide-react";
 import Button from "../ui/button";
+import { useDisclosure } from "@/hooks/useDisclosure";
+import { Drawer } from "react-daisyui";
 
 const MainLayout = () => {
+  const sidebar = useDisclosure();
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    if (sidebar.isOpen) {
+      sidebar.onClose();
+    }
+  }, [pathname]);
+
   return (
-    <div className="flex flex-row items-stretch h-screen overflow-hidden">
-      <Sidebar />
+    <Drawer
+      open={sidebar.isOpen}
+      onClickOverlay={sidebar.onClose}
+      className="md:drawer-open h-screen"
+      side={<Sidebar />}
+      contentClassName="flex flex-col overflow-hidden"
+    >
+      <Header onSidebarOpen={sidebar.onOpen} />
 
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <Header />
-
-        <main className="flex-1 overflow-y-auto p-4 md:p-8">
-          <Suspense>
-            <Outlet />
-          </Suspense>
-        </main>
-      </div>
-    </div>
+      <main className="flex-1 overflow-y-auto p-4 md:p-8">
+        <Suspense>
+          <Outlet />
+        </Suspense>
+      </main>
+    </Drawer>
   );
 };
 
-const Header = () => {
+type HeaderProps = {
+  onSidebarOpen: () => void;
+};
+
+const Header = ({ onSidebarOpen }: HeaderProps) => {
   const page = useContext(PageContext);
   const navigate = useNavigate();
 
@@ -35,11 +52,18 @@ const Header = () => {
           onClick={() => navigate(page.prev!, { replace: true })}
           color="ghost"
           shape="circle"
-          className="-ml-4"
+          className="-mx-2"
         >
           <ArrowLeft />
         </Button>
-      ) : null}
+      ) : (
+        <Button
+          icon={MenuIcon}
+          color="ghost"
+          className="md:hidden -mx-2"
+          onClick={onSidebarOpen}
+        />
+      )}
 
       <h1 className="text-xl flex-1 truncate">{page?.title || "Dashboard"}</h1>
 

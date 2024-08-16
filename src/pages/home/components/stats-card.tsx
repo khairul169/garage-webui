@@ -30,7 +30,7 @@ const StatsCard = ({
             {typeof value === "undefined" ? "..." : value}
           </p>
         )}
-        <p className="text-sm mt-0.5">{title}</p>
+        <p className="text-sm mt-0.5 truncate">{title}</p>
       </div>
     </div>
   );

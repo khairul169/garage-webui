@@ -1,9 +1,10 @@
 import { PageContextProvider } from "@/context/page-context";
 import Router from "./router";
-import "./styles.css";
 import { Toaster } from "sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
+import ThemeProvider from "@/components/containers/theme-provider";
+import "./styles.css";
 
 const App = () => {
   const [queryClient] = useState(() => new QueryClient());
@@ -14,6 +15,7 @@ const App = () => {
         <Router />
       </QueryClientProvider>
       <Toaster richColors />
+      <ThemeProvider />
     </PageContextProvider>
   );
 };

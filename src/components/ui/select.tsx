@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { ComponentPropsWithoutRef } from "react";
+import { ComponentPropsWithoutRef, forwardRef } from "react";
 import BaseSelect from "react-select";
 import Creatable from "react-select/creatable";
 
@@ -8,11 +8,12 @@ type Props = ComponentPropsWithoutRef<typeof BaseSelect> & {
   onCreateOption?: (inputValue: string) => void;
 };
 
-const Select = ({ creatable, ...props }: Props) => {
+const Select = forwardRef<any, Props>(({ creatable, ...props }, ref) => {
   const Comp = creatable ? Creatable : BaseSelect;
 
   return (
     <Comp
+      ref={ref}
       unstyled
       classNames={{
         control: (p) =>
@@ -42,6 +43,6 @@ const Select = ({ creatable, ...props }: Props) => {
       {...props}
     />
   );
-};
+});
 
 export default Select;

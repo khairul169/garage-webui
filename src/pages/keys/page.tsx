@@ -28,7 +28,7 @@ const KeysPage = () => {
     <div className="container">
       <Page title="Keys" />
 
-      <div className="flex flex-row items-center gap-2">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
         <Input placeholder="Search..." />
         <div className="flex-1" />
         <CreateKeyDialog />

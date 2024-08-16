@@ -11,6 +11,6 @@ export default {
   },
   plugins: [require("daisyui")],
   daisyui: {
-    themes: ["light", "dark", "cupcake", "pastel", "dracula"],
+    themes: require("./src/app/themes").themes,
   },
 };

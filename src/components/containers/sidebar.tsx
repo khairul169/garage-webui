@@ -1,12 +1,16 @@
-import { cn } from "@/lib/utils";
+import { cn, ucfirst } from "@/lib/utils";
 import {
   ArchiveIcon,
   HardDrive,
   KeySquare,
   LayoutDashboard,
+  Palette,
 } from "lucide-react";
-import { Menu } from "react-daisyui";
+import { Dropdown, Menu } from "react-daisyui";
 import { Link, useLocation } from "react-router-dom";
+import Button from "../ui/button";
+import { themes } from "@/app/themes";
+import appStore from "@/stores/app-store";
 
 const pages = [
   { icon: LayoutDashboard, title: "Dashboard", path: "/", exact: true },
@@ -19,7 +23,7 @@ const Sidebar = () => {
   const { pathname } = useLocation();
 
   return (
-    <aside className="bg-base-100 border-r border-base-300/30 w-[220px] overflow-y-auto">
+    <aside className="bg-base-100 border-r border-base-300/30 w-[80%] md:w-[250px] flex flex-col items-stretch overflow-hidden h-full">
       <div className="p-4">
         <img
           src="https://garagehq.deuxfleurs.fr/images/garage-logo.svg"
@@ -28,7 +32,8 @@ const Sidebar = () => {
         />
         <p className="text-sm font-medium text-center">WebUI</p>
       </div>
-      <Menu className="gap-y-1">
+
+      <Menu className="gap-y-1 flex-1 overflow-y-auto">
         {pages.map((page) => {
           const isActive = page.exact
             ? pathname === page.path
@@ -50,6 +55,22 @@ const Sidebar = () => {
           );
         })}
       </Menu>
+
+      <Dropdown className="my-2 mx-4" vertical="top">
+        <Dropdown.Toggle button={false}>
+          <Button icon={Palette} color="ghost">
+            Theme
+          </Button>
+        </Dropdown.Toggle>
+
+        <Dropdown.Menu className="max-h-[200px] overflow-y-auto">
+          {themes.map((theme) => (
+            <Dropdown.Item key={theme} onClick={() => appStore.setTheme(theme)}>
+              {ucfirst(theme)}
+            </Dropdown.Item>
+          ))}
+        </Dropdown.Menu>
+      </Dropdown>
     </aside>
   );
 };

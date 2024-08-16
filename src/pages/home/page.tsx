@@ -10,17 +10,25 @@ import {
   HardDrive,
   HardDriveUpload,
   Leaf,
+  PieChart,
 } from "lucide-react";
-import { cn, ucfirst } from "@/lib/utils";
+import { cn, readableBytes, ucfirst } from "@/lib/utils";
+import { useBuckets } from "../buckets/hooks";
+import { useMemo } from "react";
 
 const HomePage = () => {
   const { data: health } = useNodesHealth();
+  const { data: buckets } = useBuckets();
+
+  const totalUsage = useMemo(() => {
+    return buckets?.reduce((acc, bucket) => acc + bucket.bytes, 0);
+  }, [buckets]);
 
   return (
     <div className="container">
       <Page title="Dashboard" />
 
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
         <StatsCard
           title="Status"
           icon={Leaf}
@@ -64,6 +72,11 @@ const HomePage = () => {
           title="Active Partitions"
           icon={FileCheck}
           value={health?.partitionsAllOk}
+        />
+        <StatsCard
+          title="Total Usage"
+          icon={PieChart}
+          value={readableBytes(totalUsage)}
         />
       </section>
     </div>

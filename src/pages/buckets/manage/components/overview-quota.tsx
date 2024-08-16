@@ -1,12 +1,12 @@
-import { Controller, DeepPartial, useForm, useWatch } from "react-hook-form";
+import { DeepPartial, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { QuotaSchema, quotaSchema } from "../schema";
 import { useEffect } from "react";
-import { Input, Toggle } from "react-daisyui";
-import FormControl from "@/components/ui/form-control";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useUpdateBucket } from "../hooks";
 import { Bucket } from "../../types";
+import { InputField } from "@/components/ui/input";
+import { ToggleField } from "@/components/ui/toggle";
 
 type Props = {
   data?: Bucket;
@@ -49,44 +49,22 @@ const QuotaSection = ({ data }: Props) => {
 
   return (
     <div className="mt-8">
-      <p className="label label-text py-0">Quotas</p>
-
-      <label className="inline-flex label label-text gap-2 cursor-pointer">
-        <Controller
-          control={form.control}
-          name="enabled"
-          render={({ field }) => (
-            <Toggle {...(field as any)} checked={field.value} />
-          )}
-        />
-        Enabled
-      </label>
+      <ToggleField form={form} name="enabled" title="Quotas" label="Enabled" />
 
       {isEnabled && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormControl
+          <InputField
             form={form}
             name="maxObjects"
             title="Max Objects"
-            render={(field) => (
-              <Input
-                {...field}
-                type="number"
-                value={String(field.value || "")}
-              />
-            )}
+            type="number"
           />
-          <FormControl
+
+          <InputField
             form={form}
             name="maxSize"
             title="Max Size (GB)"
-            render={(field) => (
-              <Input
-                {...field}
-                type="number"
-                value={String(field.value || "")}
-              />
-            )}
+            type="number"
           />
         </div>
       )}

@@ -13,7 +13,7 @@ export const ucfirst = (text?: string | null) => {
 export const readableBytes = (bytes?: number | null, divider = 1024) => {
   if (bytes == null || Number.isNaN(bytes)) return "n/a";
 
-  const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
+  const sizes = ["B", "KB", "MB", "GB", "TB"];
   const i = Math.max(0, Math.floor(Math.log(bytes) / Math.log(divider)));
 
   return `${(bytes / Math.pow(divider, i)).toFixed(1)} ${sizes[i]}`;

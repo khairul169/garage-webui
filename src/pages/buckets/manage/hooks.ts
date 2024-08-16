@@ -1,5 +1,10 @@
 import api from "@/lib/api";
-import { MutationOptions, useMutation, useQuery } from "@tanstack/react-query";
+import {
+  MutationOptions,
+  useMutation,
+  UseMutationOptions,
+  useQuery,
+} from "@tanstack/react-query";
 import { Bucket, Permissions } from "../types";
 
 export const useBucket = (id?: string | null) => {
@@ -15,6 +20,34 @@ export const useUpdateBucket = (id?: string | null) => {
     mutationFn: (values: any) => {
       return api.put<any>("/v1/bucket", { params: { id }, body: values });
     },
+  });
+};
+
+export const useAddAlias = (
+  bucketId?: string | null,
+  options?: UseMutationOptions<any, Error, string>
+) => {
+  return useMutation({
+    mutationFn: (alias: string) => {
+      return api.put("/v1/bucket/alias/global", {
+        params: { id: bucketId, alias },
+      });
+    },
+    ...options,
+  });
+};
+
+export const useRemoveAlias = (
+  bucketId?: string | null,
+  options?: UseMutationOptions<any, Error, string>
+) => {
+  return useMutation({
+    mutationFn: (alias: string) => {
+      return api.delete("/v1/bucket/alias/global", {
+        params: { id: bucketId, alias },
+      });
+    },
+    ...options,
   });
 };
 

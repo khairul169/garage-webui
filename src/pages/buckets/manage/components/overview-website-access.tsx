@@ -1,15 +1,15 @@
-import { Controller, DeepPartial, useForm, useWatch } from "react-hook-form";
+import { DeepPartial, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { websiteConfigSchema, WebsiteConfigSchema } from "../schema";
 import { useEffect } from "react";
-import { Input, Toggle } from "react-daisyui";
-import FormControl from "@/components/ui/form-control";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useUpdateBucket } from "../hooks";
 import { useConfig } from "@/hooks/useConfig";
 import { Info, LinkIcon } from "lucide-react";
 import Button from "@/components/ui/button";
 import { Bucket } from "../../types";
+import { InputField } from "@/components/ui/input";
+import { ToggleField } from "@/components/ui/toggle";
 
 type Props = {
   data?: Bucket;
@@ -72,39 +72,24 @@ const WebsiteAccessSection = ({ data }: Props) => {
         </Button>
       </div>
 
-      <label className="inline-flex label label-text gap-2 cursor-pointer">
-        <Controller
-          control={form.control}
-          name="websiteAccess"
-          render={({ field }) => (
-            <Toggle {...(field as any)} checked={field.value} />
-          )}
-        />
-        Enabled
-      </label>
+      <ToggleField form={form} name="websiteAccess" label="Enabled" />
 
       {isEnabled && (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormControl
+            <InputField
               form={form}
               name="websiteConfig.indexDocument"
               title="Index Document"
-              render={(field) => (
-                <Input {...field} value={String(field.value || "")} />
-              )}
             />
-            <FormControl
+            <InputField
               form={form}
               name="websiteConfig.errorDocument"
               title="Error Document"
-              render={(field) => (
-                <Input {...field} value={String(field.value || "")} />
-              )}
             />
           </div>
 
-          <div className="mt-4 alert flex flex-row flex-wrap">
+          <div className="mt-4 alert flex flex-row flex-wrap text-sm gap-x-2 gap-y-1">
             <a
               href={`http://${bucketName}`}
               className="inline-flex items-center flex-row gap-2 font-medium hover:link"

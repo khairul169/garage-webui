@@ -27,7 +27,7 @@ const MenuButton = () => {
   return (
     <Dropdown end>
       <Dropdown.Toggle button={false}>
-        <Button icon={EllipsisVertical} />
+        <Button icon={EllipsisVertical} color="ghost" />
       </Dropdown.Toggle>
 
       <Dropdown.Menu>
