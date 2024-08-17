@@ -24,10 +24,27 @@ export const handleError = (err: unknown) => {
 };
 
 export const copyToClipboard = async (text: string) => {
+  let textArea: HTMLTextAreaElement | undefined;
+
   try {
-    await navigator.clipboard.writeText(text);
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      textArea = document.createElement("textarea");
+      textArea.value = text;
+
+      textArea.style.position = "absolute";
+      textArea.style.left = "-999999px";
+
+      document.body.prepend(textArea);
+      textArea.select();
+      document.execCommand("copy");
+    }
+
     toast.success("Copied to clipboard");
   } catch (err) {
     handleError(err);
+  } finally {
+    textArea?.remove();
   }
 };
