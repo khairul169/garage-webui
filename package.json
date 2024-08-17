@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "dev:server": "cd backend && npm run dev",
+    "dev:server": "cd backend && air",
     "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\""
   },
   "dependencies": {

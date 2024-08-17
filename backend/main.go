@@ -7,9 +7,13 @@ import (
 	"khairul169/garage-webui/utils"
 	"log"
 	"net/http"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	godotenv.Load()
+
 	if err := utils.Garage.LoadConfig(); err != nil {
 		log.Fatal("Failed to load config! ", err)
 	}
@@ -21,7 +25,7 @@ func main() {
 	ui.ServeUI()
 
 	host := utils.GetEnv("HOST", "0.0.0.0")
-	port := utils.GetEnv("PORT", "3908")
+	port := utils.GetEnv("PORT", "3909")
 
 	addr := fmt.Sprintf("%s:%s", host, port)
 	log.Printf("Starting server on http://%s", addr)

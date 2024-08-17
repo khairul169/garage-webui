@@ -13,7 +13,7 @@ The Garage Web UI is available as a Docker image. You can install it using the c
 ### Docker CLI
 
 ```sh
-$ docker run -p 3909:3909 -v ./garage.toml:/etc/garage.toml --restart unless-stopped --name garage-webui khairul169/garage-webui:latest
+$ docker run -p 3909:3909 -v ./garage.toml:/etc/garage.toml:ro --restart unless-stopped --name garage-webui khairul169/garage-webui:latest
 ```
 
 ### Docker Compose
@@ -37,7 +37,7 @@ services:
     container_name: garage-webui
     restart: unless-stopped
     volumes:
-      - ./garage.toml:/etc/garage.toml
+      - ./garage.toml:/etc/garage.toml:ro
     ports:
       - 3909:3909
 ```
@@ -89,7 +89,7 @@ Once your instance of Garage Web UI is started, you can open the web UI at http:
 
 ## Development
 
-This project is bootstrapped using TypeScript, Bun, React, and Hono. If you want to build it yourself or add additional features, follow these steps:
+This project is bootstrapped using TypeScript & React for the UI, and Go for backend. If you want to build it yourself or add additional features, follow these steps:
 
 ### Setup
 

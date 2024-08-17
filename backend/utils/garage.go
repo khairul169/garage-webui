@@ -21,7 +21,7 @@ type garage struct {
 var Garage = &garage{}
 
 func (g *garage) LoadConfig() error {
-	path := GetEnv("CONFIG_PATH", "/etc/garage/garage.toml")
+	path := GetEnv("CONFIG_PATH", "/etc/garage.toml")
 	data, err := os.ReadFile(path)
 
 	if err != nil {

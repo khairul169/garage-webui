@@ -13,9 +13,7 @@ services:
     image: khairul169/garage-webui:latest
     container_name: garage-webui
     restart: unless-stopped
-    environment:
-      - CONFIG_PATH=/etc/garage.toml
     volumes:
-      - ./garage.toml:/etc/garage.toml
+      - ./garage.toml:/etc/garage.toml:ro
     ports:
       - 3909:3909
