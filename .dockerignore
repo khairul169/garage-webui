@@ -4,3 +4,4 @@ node_modules
 *.md
 .env*
 dist
+backend/ui/dist

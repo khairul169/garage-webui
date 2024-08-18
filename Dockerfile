@@ -18,7 +18,7 @@ COPY backend/go.mod backend/go.sum ./
 RUN go mod download
 
 COPY backend/ ./
-COPY --from=frontend /app/dist ./ui
+COPY --from=frontend /app/dist ./ui/dist
 RUN make
 
 FROM scratch
