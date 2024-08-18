@@ -10,16 +10,22 @@ const BucketsPage = () => {
   const [search, setSearch] = useState("");
 
   const items = useMemo(() => {
-    if (!search?.length) {
-      return data;
+    let buckets = data || [];
+
+    if (search?.length > 0) {
+      const q = search.toLowerCase();
+      buckets = buckets.filter(
+        (bucket) =>
+          bucket.id.includes(q) ||
+          bucket.globalAliases.find((alias) => alias.includes(q))
+      );
     }
 
-    const q = search.toLowerCase();
-    return data?.filter(
-      (bucket) =>
-        bucket.id.includes(q) ||
-        bucket.globalAliases.find((alias) => alias.includes(q))
+    buckets = buckets.sort((a, b) =>
+      a.globalAliases[0].localeCompare(b.globalAliases[0])
     );
+
+    return buckets;
   }, [data, search]);
 
   return (

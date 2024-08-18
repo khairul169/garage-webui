@@ -1,24 +1,22 @@
 import { Card } from "react-daisyui";
-import { useParams } from "react-router-dom";
-import { useBucket } from "../hooks";
 import { ChartPie, ChartScatter } from "lucide-react";
 import { readableBytes } from "@/lib/utils";
 import WebsiteAccessSection from "./overview-website-access";
 import AliasesSection from "./overview-aliases";
 import QuotaSection from "./overview-quota";
+import { useBucketContext } from "../context";
 
 const OverviewTab = () => {
-  const { id } = useParams();
-  const { data } = useBucket(id);
+  const { bucket: data } = useBucketContext();
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8 items-start">
       <Card className="card-body gap-0 items-start order-2 md:order-1">
         <Card.Title>Summary</Card.Title>
 
-        <AliasesSection data={data} />
-        <WebsiteAccessSection data={data} />
-        <QuotaSection data={data} />
+        <AliasesSection />
+        <WebsiteAccessSection />
+        <QuotaSection />
       </Card>
 
       <Card className="card-body order-1 md:order-2">

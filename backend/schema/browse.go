@@ -13,4 +13,6 @@ type BrowserObject struct {
 	ObjectKey    *string    `json:"objectKey"`
 	LastModified *time.Time `json:"lastModified"`
 	Size         *int64     `json:"size"`
+	ViewUrl      string     `json:"viewUrl"`
+	DownloadUrl  string     `json:"downloadUrl"`
 }

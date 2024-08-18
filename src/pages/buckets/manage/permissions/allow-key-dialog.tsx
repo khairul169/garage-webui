@@ -12,13 +12,14 @@ import { useAllowKey } from "../hooks";
 import { toast } from "sonner";
 import { handleError } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
+import { useBucketContext } from "../context";
 
 type Props = {
-  id?: string;
   currentKeys?: string[];
 };
 
-const AllowKeyDialog = ({ id, currentKeys }: Props) => {
+const AllowKeyDialog = ({ currentKeys }: Props) => {
+  const { bucket } = useBucketContext();
   const { dialogRef, isOpen, onOpen, onClose } = useDisclosure();
   const { data: keys } = useKeys();
   const form = useForm<AllowKeysSchema>({
@@ -30,12 +31,12 @@ const AllowKeyDialog = ({ id, currentKeys }: Props) => {
   });
   const queryClient = useQueryClient();
 
-  const allowKey = useAllowKey(id, {
+  const allowKey = useAllowKey(bucket.id, {
     onSuccess: () => {
       form.reset();
       onClose();
       toast.success("Key allowed!");
-      queryClient.invalidateQueries({ queryKey: ["bucket", id] });
+      queryClient.invalidateQueries({ queryKey: ["bucket", bucket.id] });
     },
     onError: handleError,
   });

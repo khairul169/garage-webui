@@ -8,7 +8,7 @@ export type Tab = {
   name: string;
   title?: string;
   icon?: LucideIcon;
-  Component?: () => JSX.Element;
+  Component?: () => JSX.Element | null;
 };
 
 type Props = {
@@ -36,13 +36,16 @@ const TabView = ({
     <>
       <Tabs
         variant="boxed"
-        className={cn("w-auto inline-flex flex-row items-stretch", className)}
+        className={cn(
+          "w-auto inline-flex flex-row items-stretch overflow-x-auto",
+          className
+        )}
       >
         {tabs.map(({ icon: Icon, ...tab }) => (
           <Tabs.Tab
             key={tab.name}
             active={curTab === tab.name}
-            className="flex flex-row items-center gap-x-2 h-auto"
+            className="flex flex-row items-center gap-x-2 h-auto shrink-0"
             onClick={() => {
               setSearchParams((params) => {
                 params.set(name, tab.name);

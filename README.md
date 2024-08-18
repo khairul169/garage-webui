@@ -6,6 +6,14 @@ A simple admin web UI for [Garage](https://garagehq.deuxfleurs.fr/), a self-host
 
 [ [Screenshots](misc/SCREENSHOTS.md) | [Install Garage](https://garagehq.deuxfleurs.fr/documentation/quick-start/) | [Garage Git](https://git.deuxfleurs.fr/Deuxfleurs/garage) ]
 
+## Features
+
+- Garage health status
+- Cluster & layout management
+- Create, update, or view bucket information
+- Integrated objects/bucket browser
+- Create & assign access keys
+
 ## Installation
 
 The Garage Web UI is available as a single executable binary and docker image. You can install it using the command line or with Docker Compose.

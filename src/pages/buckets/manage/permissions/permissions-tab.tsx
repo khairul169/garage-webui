@@ -1,5 +1,4 @@
-import { useParams } from "react-router-dom";
-import { useBucket, useDenyKey } from "../hooks";
+import { useDenyKey } from "../hooks";
 import { Card, Checkbox, Table } from "react-daisyui";
 import Button from "@/components/ui/button";
 import { Trash } from "lucide-react";
@@ -7,12 +6,12 @@ import AllowKeyDialog from "./allow-key-dialog";
 import { useMemo } from "react";
 import { toast } from "sonner";
 import { handleError } from "@/lib/utils";
+import { useBucketContext } from "../context";
 
 const PermissionsTab = () => {
-  const { id } = useParams();
-  const { data, refetch } = useBucket(id);
+  const { bucket, refetch } = useBucketContext();
 
-  const denyKey = useDenyKey(id, {
+  const denyKey = useDenyKey(bucket.id, {
     onSuccess: () => {
       toast.success("Key removed!");
       refetch();
@@ -21,13 +20,13 @@ const PermissionsTab = () => {
   });
 
   const keys = useMemo(() => {
-    return data?.keys.filter(
+    return bucket?.keys.filter(
       (key) =>
         key.permissions.read !== false ||
         key.permissions.write !== false ||
         key.permissions.owner !== false
     );
-  }, [data?.keys]);
+  }, [bucket?.keys]);
 
   const onRemove = (id: string) => {
     if (window.confirm("Are you sure you want to remove this key?")) {
@@ -43,10 +42,7 @@ const PermissionsTab = () => {
       <Card className="card-body">
         <div className="flex flex-row items-center gap-2">
           <Card.Title className="flex-1 truncate">Access Keys</Card.Title>
-          <AllowKeyDialog
-            id={id}
-            currentKeys={keys?.map((key) => key.accessKeyId)}
-          />
+          <AllowKeyDialog currentKeys={keys?.map((key) => key.accessKeyId)} />
         </div>
 
         <div className="overflow-x-auto">

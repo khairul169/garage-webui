@@ -46,6 +46,7 @@ export const ToggleField = <T extends FieldValues>({
           {...props}
           {...field}
           className={inputClassName}
+          color={field.value ? "primary" : undefined}
           checked={field.value || false}
           onChange={(e) => field.onChange(e.target.checked)}
         />

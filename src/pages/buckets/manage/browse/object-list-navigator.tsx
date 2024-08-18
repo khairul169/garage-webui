@@ -1,10 +1,9 @@
 import Button from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Home, LucideIcon } from "lucide-react";
 import { Fragment } from "react/jsx-runtime";
 
 type Props = {
-  bucketName?: string;
   curPrefix: number;
   setCurPrefix: React.Dispatch<React.SetStateAction<number>>;
   prefixHistory: string[];
@@ -12,7 +11,6 @@ type Props = {
 };
 
 const ObjectListNavigator = ({
-  bucketName,
   curPrefix,
   setCurPrefix,
   prefixHistory,
@@ -45,16 +43,16 @@ const ObjectListNavigator = ({
         />
       </div>
 
-      <div className="order-3 md:order-2 flex flex-row w-full overflow-x-auto items-center bg-base-200 h-10 flex-1 shrink-0 min-w-[80%] md:min-w-0 rounded-lg mx-2 pl-4">
+      <div className="order-3 md:order-2 flex flex-row w-full overflow-x-auto items-center bg-base-200 h-10 flex-1 shrink-0 min-w-[80%] md:min-w-0 rounded-lg mx-2 px-2">
         <HistoryItem
-          title={bucketName}
+          icon={Home}
           isActive={curPrefix === -1}
           onClick={() => setCurPrefix(-1)}
         />
 
         {prefixHistory.map((prefix, i) => (
           <Fragment key={prefix}>
-            <ChevronRight className="shrink-0" size={20} />
+            <ChevronRight className="shrink-0" size={18} />
             <HistoryItem
               title={prefix
                 .substring(0, prefix.lastIndexOf("/"))
@@ -75,13 +73,19 @@ const ObjectListNavigator = ({
 };
 
 type HistoryItemProps = {
+  icon?: LucideIcon;
   title?: string;
   isActive: boolean;
   onClick: () => void;
 };
 
-const HistoryItem = ({ title, isActive, onClick }: HistoryItemProps) => {
-  if (!title) {
+const HistoryItem = ({
+  icon: Icon,
+  title,
+  isActive,
+  onClick,
+}: HistoryItemProps) => {
+  if (!title && !Icon) {
     return null;
   }
 
@@ -92,8 +96,13 @@ const HistoryItem = ({ title, isActive, onClick }: HistoryItemProps) => {
         e.preventDefault();
         onClick();
       }}
-      className={cn("px-2 rounded-sm shrink-0", isActive && "bg-neutral")}
+      className={cn(
+        "px-2 rounded-md shrink-0 max-w-[150px] truncate",
+        isActive && "bg-neutral",
+        Icon ? "py-1" : null
+      )}
     >
+      {Icon ? <Icon size={18} /> : null}
       {title}
     </a>
   );

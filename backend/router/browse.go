@@ -72,6 +72,8 @@ func (b *Browse) GetObjects(w http.ResponseWriter, r *http.Request) {
 			ObjectKey:    &key,
 			LastModified: object.LastModified,
 			Size:         object.Size,
+			ViewUrl:      fmt.Sprintf("/browse/%s/%s?view=1", bucket, *object.Key),
+			DownloadUrl:  fmt.Sprintf("/browse/%s/%s?dl=1", bucket, *object.Key),
 		})
 	}
 
@@ -111,6 +113,11 @@ func (b *Browse) GetOneObject(w http.ResponseWriter, r *http.Request) {
 		keys := strings.Split(key, "/")
 
 		w.Header().Set("Content-Type", *object.ContentType)
+		w.Header().Set("Content-Length", strconv.FormatInt(*object.ContentLength, 10))
+		w.Header().Set("Cache-Control", "max-age=86400")
+		w.Header().Set("Last-Modified", object.LastModified.Format(time.RFC1123))
+		w.Header().Set("Etag", *object.ETag)
+
 		if download {
 			w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", keys[len(keys)-1]))
 		}
@@ -126,6 +133,74 @@ func (b *Browse) GetOneObject(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.ResponseSuccess(w, object)
+}
+
+func (b *Browse) PutObject(w http.ResponseWriter, r *http.Request) {
+	bucket := r.PathValue("bucket")
+	key := r.PathValue("key")
+	isDirectory := strings.HasSuffix(key, "/")
+
+	file, headers, err := r.FormFile("file")
+	if err != nil && !isDirectory {
+		utils.ResponseError(w, err)
+		return
+	}
+
+	if file != nil {
+		defer file.Close()
+	}
+
+	client, err := getS3Client(bucket)
+	if err != nil {
+		utils.ResponseError(w, err)
+		return
+	}
+
+	var contentType string = ""
+	var size int64 = 0
+
+	if file != nil {
+		contentType = headers.Header.Get("Content-Type")
+		size = headers.Size
+	}
+
+	result, err := client.PutObject(context.Background(), &s3.PutObjectInput{
+		Bucket:        aws.String(bucket),
+		Key:           aws.String(key),
+		Body:          file,
+		ContentLength: aws.Int64(size),
+		ContentType:   aws.String(contentType),
+	})
+
+	if err != nil {
+		utils.ResponseError(w, fmt.Errorf("cannot put object: %w", err))
+		return
+	}
+
+	utils.ResponseSuccess(w, result)
+}
+
+func (b *Browse) DeleteObject(w http.ResponseWriter, r *http.Request) {
+	bucket := r.PathValue("bucket")
+	key := r.PathValue("key")
+
+	client, err := getS3Client(bucket)
+	if err != nil {
+		utils.ResponseError(w, err)
+		return
+	}
+
+	_, err = client.DeleteObject(context.Background(), &s3.DeleteObjectInput{
+		Bucket: aws.String(bucket),
+		Key:    aws.String(key),
+	})
+
+	if err != nil {
+		utils.ResponseError(w, fmt.Errorf("cannot delete object: %w", err))
+		return
+	}
+
+	utils.ResponseSuccess(w, nil)
 }
 
 func getBucketCredentials(bucket string) (aws.CredentialsProvider, error) {

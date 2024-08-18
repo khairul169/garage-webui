@@ -7,20 +7,16 @@ import { useUpdateBucket } from "../hooks";
 import { useConfig } from "@/hooks/useConfig";
 import { Info, LinkIcon } from "lucide-react";
 import Button from "@/components/ui/button";
-import { Bucket } from "../../types";
 import { InputField } from "@/components/ui/input";
 import { ToggleField } from "@/components/ui/toggle";
+import { useBucketContext } from "../context";
 
-type Props = {
-  data?: Bucket;
-};
-
-const WebsiteAccessSection = ({ data }: Props) => {
+const WebsiteAccessSection = () => {
+  const { bucket: data, bucketName } = useBucketContext();
   const { data: config } = useConfig();
   const form = useForm<WebsiteConfigSchema>({
     resolver: zodResolver(websiteConfigSchema),
   });
-  const bucketName = data?.globalAliases[0] || "";
   const isEnabled = useWatch({ control: form.control, name: "websiteAccess" });
 
   const websitePort = config?.s3_web?.bind_addr?.split(":").pop() || "80";

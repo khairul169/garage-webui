@@ -7,6 +7,7 @@ import OverviewTab from "./overview/overview-tab";
 import PermissionsTab from "./permissions/permissions-tab";
 import MenuButton from "./components/menu-button";
 import BrowseTab from "./browse/browse-tab";
+import { BucketContext } from "./context";
 
 const tabs: Tab[] = [
   {
@@ -31,7 +32,7 @@ const tabs: Tab[] = [
 
 const ManageBucketPage = () => {
   const { id } = useParams();
-  const { data } = useBucket(id);
+  const { data, refetch } = useBucket(id);
 
   const name = data?.globalAliases[0];
 
@@ -40,9 +41,16 @@ const ManageBucketPage = () => {
       <Page
         title={name || "Manage Bucket"}
         prev="/buckets"
-        actions={<MenuButton />}
+        actions={data ? <MenuButton /> : undefined}
       />
-      <TabView tabs={tabs} className="bg-base-100 h-14 px-1.5" />
+
+      {data && (
+        <BucketContext.Provider
+          value={{ bucket: data, refetch, bucketName: name || "" }}
+        >
+          <TabView tabs={tabs} className="bg-base-100 h-14 px-1.5" />
+        </BucketContext.Provider>
+      )}
     </div>
   );
 };

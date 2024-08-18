@@ -1,25 +1,36 @@
-import { useParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { Card } from "react-daisyui";
 
 import ObjectList from "./object-list";
-import { useBucket } from "../hooks";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ObjectListNavigator from "./object-list-navigator";
-import {
-  EllipsisVertical,
-  FilePlus,
-  FolderPlus,
-  UploadIcon,
-} from "lucide-react";
-import Button from "@/components/ui/button";
+import Actions from "./actions";
+import { useBucketContext } from "../context";
+import ShareDialog from "./share-dialog";
+
+const getInitialPrefixes = (searchParams: URLSearchParams) => {
+  const prefix = searchParams.get("prefix");
+  if (prefix) {
+    const paths = prefix.split("/").filter((p) => p);
+    return paths.map((_, i) => paths.slice(0, i + 1).join("/") + "/");
+  }
+  return [];
+};
 
 const BrowseTab = () => {
-  const { id } = useParams();
-  const { data: bucket } = useBucket(id);
+  const { bucket } = useBucketContext();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [prefixHistory, setPrefixHistory] = useState<string[]>(
+    getInitialPrefixes(searchParams)
+  );
+  const [curPrefix, setCurPrefix] = useState(prefixHistory.length - 1);
 
-  const [curPrefix, setCurPrefix] = useState(-1);
-  const [prefixHistory, setPrefixHistory] = useState<string[]>([]);
-  const bucketName = bucket?.globalAliases[0];
+  useEffect(() => {
+    const prefix = prefixHistory[curPrefix] || "";
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set("prefix", prefix);
+    setSearchParams(newParams);
+  }, [curPrefix]);
 
   const gotoPrefix = (prefix: string) => {
     const history = prefixHistory.slice(0, curPrefix + 1);
@@ -27,15 +38,12 @@ const BrowseTab = () => {
     setCurPrefix(history.length);
   };
 
-  if (!bucket) {
-    return null;
-  }
-
   if (!bucket.keys.find((k) => k.permissions.read && k.permissions.write)) {
     return (
-      <div className="p-4 min-h-[200px] flex flex-col justify-center">
-        <p className="text-center">
-          You need to add a key to your bucket to be able to browse it.
+      <div className="p-4 min-h-[200px] flex flex-col items-center justify-center">
+        <p className="text-center max-w-sm">
+          You need to add a key with read & write access to your bucket to be
+          able to browse it.
         </p>
       </div>
     );
@@ -43,29 +51,20 @@ const BrowseTab = () => {
 
   return (
     <div>
-      <Card>
+      <Card className="pb-2">
         <ObjectListNavigator
-          bucketName={bucketName}
           curPrefix={curPrefix}
           setCurPrefix={setCurPrefix}
           prefixHistory={prefixHistory}
-          actions={
-            <>
-              <Button icon={FolderPlus} color="ghost" />
-              <Button icon={FilePlus} color="ghost" />
-              <Button icon={UploadIcon} color="ghost" />
-              <Button icon={EllipsisVertical} color="ghost" />
-            </>
-          }
+          actions={<Actions prefix={prefixHistory[curPrefix] || ""} />}
         />
 
-        {bucketName ? (
-          <ObjectList
-            bucket={bucketName}
-            prefix={prefixHistory[curPrefix] || ""}
-            onPrefixChange={gotoPrefix}
-          />
-        ) : null}
+        <ObjectList
+          prefix={prefixHistory[curPrefix] || ""}
+          onPrefixChange={gotoPrefix}
+        />
+
+        <ShareDialog />
       </Card>
     </div>
   );

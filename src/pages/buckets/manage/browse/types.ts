@@ -15,4 +15,11 @@ export type Object = {
   objectKey: string;
   lastModified: Date;
   size: number;
+  viewUrl: string;
+  downloadUrl: string;
+};
+
+export type PutObjectPayload = {
+  key: string;
+  file: File | null;
 };

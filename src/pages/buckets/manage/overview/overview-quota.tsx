@@ -4,15 +4,13 @@ import { QuotaSchema, quotaSchema } from "../schema";
 import { useEffect } from "react";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useUpdateBucket } from "../hooks";
-import { Bucket } from "../../types";
 import { InputField } from "@/components/ui/input";
 import { ToggleField } from "@/components/ui/toggle";
+import { useBucketContext } from "../context";
 
-type Props = {
-  data?: Bucket;
-};
+const QuotaSection = () => {
+  const { bucket: data } = useBucketContext();
 
-const QuotaSection = ({ data }: Props) => {
   const form = useForm<QuotaSchema>({
     resolver: zodResolver(quotaSchema),
   });
@@ -23,7 +21,7 @@ const QuotaSection = ({ data }: Props) => {
   const onChange = useDebounce((values: DeepPartial<QuotaSchema>) => {
     const { enabled } = values;
     const maxObjects = Number(values.maxObjects);
-    const maxSize = Math.round(Number(values.maxSize) * 1024 * 1024);
+    const maxSize = Math.round(Number(values.maxSize) * 1024 ** 3);
 
     const data = {
       maxObjects: enabled && maxObjects > 0 ? maxObjects : null,
@@ -37,9 +35,7 @@ const QuotaSection = ({ data }: Props) => {
     form.reset({
       enabled:
         data?.quotas?.maxSize != null || data?.quotas?.maxObjects != null,
-      maxSize: data?.quotas?.maxSize
-        ? data?.quotas?.maxSize / 1024 / 1024
-        : null,
+      maxSize: data?.quotas?.maxSize ? data?.quotas?.maxSize / 1024 ** 3 : null,
       maxObjects: data?.quotas?.maxObjects || null,
     });
 

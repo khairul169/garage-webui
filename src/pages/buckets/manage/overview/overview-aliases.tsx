@@ -1,7 +1,6 @@
 import { Modal } from "react-daisyui";
 import { Plus } from "lucide-react";
 import Chips from "@/components/ui/chips";
-import { Bucket } from "../../types";
 import { useDisclosure } from "@/hooks/useDisclosure";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,12 +12,11 @@ import { handleError } from "@/lib/utils";
 import { InputField } from "@/components/ui/input";
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { useBucketContext } from "../context";
 
-type Props = {
-  data?: Bucket;
-};
+const AliasesSection = () => {
+  const { bucket: data } = useBucketContext();
 
-const AliasesSection = ({ data }: Props) => {
   const queryClient = useQueryClient();
   const removeAlias = useRemoveAlias(data?.id, {
     onSuccess: () => {
