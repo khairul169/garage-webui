@@ -8,7 +8,7 @@ A simple admin web UI for [Garage](https://garagehq.deuxfleurs.fr/), a self-host
 
 ## Installation
 
-The Garage Web UI is available as a Docker image. You can install it using the command line or with Docker Compose.
+The Garage Web UI is available as a single executable binary and docker image. You can install it using the command line or with Docker Compose.
 
 ### Docker CLI
 
@@ -40,6 +40,50 @@ services:
       - ./garage.toml:/etc/garage.toml:ro
     ports:
       - 3909:3909
+```
+
+### Without Docker
+
+Get the latest binary from the [release page](https://github.com/khairul169/garage-webui/releases/latest) according to your OS architecture. For example:
+
+```sh
+$ wget -O garage-webui https://github.com/khairul169/garage-webui/releases/download/1.0.1/garage-webui-v1.0.1-linux-amd64
+$ chmod +x garage-webui
+$ sudo cp garage-webui /usr/local/bin
+```
+
+Run the program with specified `garage.toml` config path.
+
+```sh
+$ CONFIG_PATH=./garage.toml garage-webui
+```
+
+If you want to run the program at startup, you may want to create a systemd service.
+
+```sh
+$ sudo nano /etc/systemd/system/garage-webui.service
+```
+
+```
+[Unit]
+Description=Garage Web UI
+After=network.target
+
+[Service]
+Environment="PORT=3919"
+Environment="CONFIG_PATH=/etc/garage.toml"
+ExecStart=/usr/local/bin/garage-webui
+Restart=always
+
+[Install]
+WantedBy=default.target
+```
+
+Then reload and start the garage-webui service.
+
+```sh
+$ sudo systemctl daemon-reload
+$ sudo systemctl enable --now garage-webui
 ```
 
 ### Configuration
