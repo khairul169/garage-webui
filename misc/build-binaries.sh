@@ -9,7 +9,8 @@ ARCHITECTURES="386 amd64 arm arm64"
 
 echo "Building version $VERSION"
 
-cd backend && rm -rf dist && mkdir -p dist && cp -r ../dist ./ui/dist
+npm run build
+cd backend && rm -rf dist && mkdir -p dist && rm -rf ./ui/dist && cp -r ../dist ./ui/dist
 
 for PLATFORM in $PLATFORMS; do
     for ARCH in $ARCHITECTURES; do
