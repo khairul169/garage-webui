@@ -23,6 +23,11 @@ func ResponseError(w http.ResponseWriter, err error) {
 	w.Write([]byte(err.Error()))
 }
 
+func ResponseErrorStatus(w http.ResponseWriter, err error, status int) {
+	w.WriteHeader(status)
+	w.Write([]byte(err.Error()))
+}
+
 func ResponseSuccess(w http.ResponseWriter, data interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)

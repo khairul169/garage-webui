@@ -2,10 +2,11 @@ import { useParams } from "react-router-dom";
 import { useBucket } from "./hooks";
 import Page from "@/context/page-context";
 import TabView, { Tab } from "@/components/containers/tab-view";
-import { ChartLine, LockKeyhole } from "lucide-react";
-import OverviewTab from "./components/overview-tab";
-import PermissionsTab from "./components/permissions-tab";
+import { ChartLine, FolderSearch, LockKeyhole } from "lucide-react";
+import OverviewTab from "./overview/overview-tab";
+import PermissionsTab from "./permissions/permissions-tab";
 import MenuButton from "./components/menu-button";
+import BrowseTab from "./browse/browse-tab";
 
 const tabs: Tab[] = [
   {
@@ -20,11 +21,12 @@ const tabs: Tab[] = [
     icon: LockKeyhole,
     Component: PermissionsTab,
   },
-  // {
-  //   name: "browse",
-  //   title: "Browse",
-  //   icon: FolderSearch,
-  // },
+  {
+    name: "browse",
+    title: "Browse",
+    icon: FolderSearch,
+    Component: BrowseTab,
+  },
 ];
 
 const ManageBucketPage = () => {

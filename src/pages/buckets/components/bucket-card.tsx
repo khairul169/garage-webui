@@ -40,7 +40,9 @@ const BucketCard = ({ data }: Props) => {
 
       <div className="flex flex-row justify-end gap-4">
         <Button href={`/buckets/${data.id}`}>Manage</Button>
-        {/* <Button color="primary">Browse</Button> */}
+        <Button color="primary" href={`/buckets/${data.id}?tab=browse`}>
+          Browse
+        </Button>
       </div>
     </div>
   );

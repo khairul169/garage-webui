@@ -26,6 +26,7 @@ type KeyElement struct {
 	Name               string        `json:"name"`
 	Permissions        Permissions   `json:"permissions"`
 	BucketLocalAliases []interface{} `json:"bucketLocalAliases"`
+	SecretAccessKey    string        `json:"secretAccessKey"`
 }
 
 type Permissions struct {

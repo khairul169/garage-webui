@@ -5,7 +5,9 @@ import (
 	"net/http"
 )
 
-func GetConfig(w http.ResponseWriter, r *http.Request) {
+type Config struct{}
+
+func (c *Config) GetAll(w http.ResponseWriter, r *http.Request) {
 	config := utils.Garage.Config
 	utils.ResponseSuccess(w, config)
 }

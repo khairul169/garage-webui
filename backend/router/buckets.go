@@ -8,7 +8,9 @@ import (
 	"net/http"
 )
 
-func GetAllBuckets(w http.ResponseWriter, r *http.Request) {
+type Buckets struct{}
+
+func (b *Buckets) GetAll(w http.ResponseWriter, r *http.Request) {
 	body, err := utils.Garage.Fetch("/v1/bucket?list", &utils.FetchOptions{})
 	if err != nil {
 		utils.ResponseError(w, err)

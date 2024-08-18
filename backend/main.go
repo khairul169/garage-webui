@@ -13,15 +13,13 @@ import (
 
 func main() {
 	godotenv.Load()
+	utils.InitCacheManager()
 
 	if err := utils.Garage.LoadConfig(); err != nil {
 		log.Fatal("Failed to load config! ", err)
 	}
 
-	http.HandleFunc("/api/config", router.GetConfig)
-	http.HandleFunc("/api/buckets", router.GetAllBuckets)
-	http.HandleFunc("/api/*", router.ProxyHandler)
-
+	http.Handle("/api/", http.StripPrefix("/api", router.HandleApiRouter()))
 	ui.ServeUI()
 
 	host := utils.GetEnv("HOST", "0.0.0.0")

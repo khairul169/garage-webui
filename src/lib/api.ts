@@ -4,10 +4,12 @@ type FetchOptions = Omit<RequestInit, "headers" | "body"> & {
   body?: any;
 };
 
+export const API_URL = "/api";
+
 const api = {
   async fetch<T = any>(url: string, options?: Partial<FetchOptions>) {
     const headers: Record<string, string> = {};
-    const _url = new URL("/api" + url, window.location.origin);
+    const _url = new URL(API_URL + url, window.location.origin);
 
     if (options?.params) {
       Object.entries(options.params).forEach(([key, value]) => {

@@ -1,6 +1,11 @@
 import clsx from "clsx";
 import { toast } from "sonner";
 import { twMerge } from "tailwind-merge";
+import dayjsRelativeTime from "dayjs/plugin/relativeTime";
+import dayjs from "dayjs";
+
+dayjs.extend(dayjsRelativeTime);
+export { dayjs };
 
 export const cn = (...args: any[]) => {
   return twMerge(clsx(...args));
