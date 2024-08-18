@@ -1,9 +1,4 @@
-import {
-  EllipsisVertical,
-  FilePlus,
-  FolderPlus,
-  UploadIcon,
-} from "lucide-react";
+import { FolderPlus, UploadIcon } from "lucide-react";
 import Button from "@/components/ui/button";
 import { usePutObject } from "./hooks";
 import { toast } from "sonner";

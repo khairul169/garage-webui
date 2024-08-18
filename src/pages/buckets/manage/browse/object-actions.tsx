@@ -1,4 +1,4 @@
-import { Dropdown, Modal } from "react-daisyui";
+import { Dropdown } from "react-daisyui";
 import { Object } from "./types";
 import Button from "@/components/ui/button";
 import { DownloadIcon, EllipsisVertical, Share2, Trash } from "lucide-react";
