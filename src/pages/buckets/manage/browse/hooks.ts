@@ -40,10 +40,13 @@ export const usePutObject = (
 
 export const useDeleteObject = (
   bucket: string,
-  options?: UseMutationOptions<any, Error, string>
+  options?: UseMutationOptions<any, Error, { key: string; recursive?: boolean }>
 ) => {
   return useMutation({
-    mutationFn: (key) => api.delete(`/browse/${bucket}/${key}`),
+    mutationFn: (data) =>
+      api.delete(`/browse/${bucket}/${data.key}`, {
+        params: { recursive: data.recursive },
+      }),
     ...options,
   });
 };

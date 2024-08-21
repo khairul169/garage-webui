@@ -34,8 +34,17 @@ const ObjectActions = ({ prefix = "", object, end }: Props) => {
   };
 
   const onDelete = () => {
-    if (window.confirm("Are you sure you want to delete this object?")) {
-      deleteObject.mutate(prefix + object.objectKey);
+    if (
+      window.confirm(
+        `Are you sure you want to delete this ${
+          isDirectory ? "directory and its content" : "object"
+        }?`
+      )
+    ) {
+      deleteObject.mutate({
+        key: prefix + object.objectKey,
+        recursive: isDirectory,
+      });
     }
   };
 

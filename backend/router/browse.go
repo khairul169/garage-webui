@@ -16,6 +16,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/aws/smithy-go"
 )
 
@@ -183,6 +184,8 @@ func (b *Browse) PutObject(w http.ResponseWriter, r *http.Request) {
 func (b *Browse) DeleteObject(w http.ResponseWriter, r *http.Request) {
 	bucket := r.PathValue("bucket")
 	key := r.PathValue("key")
+	recursive := r.URL.Query().Get("recursive") == "true"
+	isDirectory := strings.HasSuffix(key, "/")
 
 	client, err := getS3Client(bucket)
 	if err != nil {
@@ -190,7 +193,52 @@ func (b *Browse) DeleteObject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = client.DeleteObject(context.Background(), &s3.DeleteObjectInput{
+	// Delete directory and its content
+	if isDirectory && recursive {
+		objects, err := client.ListObjectsV2(context.Background(), &s3.ListObjectsV2Input{
+			Bucket: aws.String(bucket),
+			Prefix: aws.String(key),
+		})
+
+		if err != nil {
+			utils.ResponseError(w, err)
+			return
+		}
+
+		if len(objects.Contents) == 0 {
+			utils.ResponseSuccess(w, true)
+			return
+		}
+
+		keys := make([]types.ObjectIdentifier, 0, len(objects.Contents))
+
+		for _, object := range objects.Contents {
+			keys = append(keys, types.ObjectIdentifier{
+				Key: object.Key,
+			})
+		}
+
+		res, err := client.DeleteObjects(context.Background(), &s3.DeleteObjectsInput{
+			Bucket: aws.String(bucket),
+			Delete: &types.Delete{Objects: keys},
+		})
+
+		if err != nil {
+			utils.ResponseError(w, fmt.Errorf("cannot delete object: %w", err))
+			return
+		}
+
+		if len(res.Errors) > 0 {
+			utils.ResponseError(w, fmt.Errorf("cannot delete object: %v", res.Errors[0]))
+			return
+		}
+
+		utils.ResponseSuccess(w, res)
+		return
+	}
+
+	// Delete single object
+	res, err := client.DeleteObject(context.Background(), &s3.DeleteObjectInput{
 		Bucket: aws.String(bucket),
 		Key:    aws.String(key),
 	})
@@ -200,7 +248,7 @@ func (b *Browse) DeleteObject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	utils.ResponseSuccess(w, nil)
+	utils.ResponseSuccess(w, res)
 }
 
 func getBucketCredentials(bucket string) (aws.CredentialsProvider, error) {
