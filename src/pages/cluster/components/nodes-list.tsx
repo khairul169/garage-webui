@@ -184,7 +184,7 @@ const NodesList = ({ nodes }: NodeListProps) => {
         </Alert>
       ) : null}
 
-      <div className="w-full overflow-x-auto min-h-[400px] pb-16">
+      <div className="w-full overflow-x-auto overflow-y-hidden min-h-[400px]">
         <Table size="sm" className="min-w-[800px]">
           <Table.Head>
             <span>#</span>
@@ -266,7 +266,10 @@ const NodesList = ({ nodes }: NodeListProps) => {
                     : "Inactive"}
                 </Badge>
 
-                <Dropdown end>
+                <Dropdown
+                  end
+                  vertical={idx >= items.length - 2 ? "top" : "bottom"}
+                >
                   <Dropdown.Toggle button={false}>
                     <Button shape="circle" color="ghost">
                       <EllipsisVertical />

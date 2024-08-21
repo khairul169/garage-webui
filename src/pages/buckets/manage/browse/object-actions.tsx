@@ -13,9 +13,10 @@ import { shareDialog } from "./share-dialog";
 type Props = {
   prefix?: string;
   object: Pick<Object, "objectKey" | "downloadUrl">;
+  end?: boolean;
 };
 
-const ObjectActions = ({ prefix = "", object }: Props) => {
+const ObjectActions = ({ prefix = "", object, end }: Props) => {
   const { bucketName } = useBucketContext();
   const queryClient = useQueryClient();
   const isDirectory = object.objectKey.endsWith("/");
@@ -45,12 +46,12 @@ const ObjectActions = ({ prefix = "", object }: Props) => {
           <Button icon={DownloadIcon} color="ghost" onClick={onDownload} />
         )}
 
-        <Dropdown end>
+        <Dropdown end vertical={end ? "top" : "bottom"}>
           <Dropdown.Toggle button={false}>
             <Button icon={EllipsisVertical} color="ghost" />
           </Dropdown.Toggle>
 
-          <Dropdown.Menu className="bg-base-300 gap-y-1">
+          <Dropdown.Menu className="gap-y-1">
             <Dropdown.Item
               onClick={() =>
                 shareDialog.open({ key: object.objectKey, prefix })

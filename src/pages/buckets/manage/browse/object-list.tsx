@@ -23,7 +23,7 @@ const ObjectList = ({ prefix, onPrefixChange }: Props) => {
   };
 
   return (
-    <div className="overflow-x-auto pb-32">
+    <div className="overflow-x-auto overflow-y-hidden">
       <Table>
         <Table.Head>
           <span>Name</span>
@@ -63,7 +63,7 @@ const ObjectList = ({ prefix, onPrefixChange }: Props) => {
             </tr>
           ))}
 
-          {data?.objects.map((object) => {
+          {data?.objects.map((object, idx) => {
             const extIdx = object.objectKey.lastIndexOf(".");
             const filename =
               extIdx >= 0
@@ -93,7 +93,11 @@ const ObjectList = ({ prefix, onPrefixChange }: Props) => {
                 <td className="whitespace-nowrap">
                   {dayjs(object.lastModified).fromNow()}
                 </td>
-                <ObjectActions prefix={data.prefix} object={object} />
+                <ObjectActions
+                  prefix={data.prefix}
+                  object={object}
+                  end={idx >= data.objects.length - 2}
+                />
               </tr>
             );
           })}

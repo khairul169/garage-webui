@@ -96,6 +96,7 @@ const KeysPage = () => {
                       icon={Eye}
                       size="sm"
                       onClick={() => fetchSecretKey(key.id)}
+                      className="shrink-0 min-w-[80px]"
                     >
                       View
                     </Button>

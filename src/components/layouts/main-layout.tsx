@@ -21,7 +21,7 @@ const MainLayout = () => {
     <Drawer
       open={sidebar.isOpen}
       onClickOverlay={sidebar.onClose}
-      className="md:drawer-open h-screen"
+      className="md:drawer-open h-screen max-h-dvh"
       side={<Sidebar />}
       contentClassName="flex flex-col overflow-hidden"
     >
