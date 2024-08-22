@@ -1,6 +1,8 @@
 package router
 
-import "net/http"
+import (
+	"net/http"
+)
 
 func HandleApiRouter() *http.ServeMux {
 	router := http.NewServeMux()
@@ -18,6 +20,14 @@ func HandleApiRouter() *http.ServeMux {
 	router.HandleFunc("DELETE /browse/{bucket}/{key...}", browse.DeleteObject)
 
 	router.HandleFunc("/", ProxyHandler)
+
+	return router
+}
+
+func HandleWebsocket() *http.ServeMux {
+	router := http.NewServeMux()
+
+	router.HandleFunc("/terminal", TerminalHandler)
 
 	return router
 }

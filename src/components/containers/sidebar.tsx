@@ -5,6 +5,7 @@ import {
   KeySquare,
   LayoutDashboard,
   Palette,
+  SquareTerminal,
 } from "lucide-react";
 import { Dropdown, Menu } from "react-daisyui";
 import { Link, useLocation } from "react-router-dom";
@@ -18,6 +19,7 @@ const pages = [
   { icon: HardDrive, title: "Cluster", path: "/cluster" },
   { icon: ArchiveIcon, title: "Buckets", path: "/buckets" },
   { icon: KeySquare, title: "Keys", path: "/keys" },
+  { icon: SquareTerminal, title: "Terminal", path: "/terminal" },
 ];
 
 const Sidebar = () => {

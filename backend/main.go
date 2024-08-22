@@ -20,6 +20,8 @@ func main() {
 	}
 
 	http.Handle("/api/", http.StripPrefix("/api", router.HandleApiRouter()))
+	http.Handle("/ws/", http.StripPrefix("/ws", router.HandleWebsocket()))
+
 	ui.ServeUI()
 
 	host := utils.GetEnv("HOST", "0.0.0.0")

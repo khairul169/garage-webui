@@ -14,6 +14,12 @@ importers:
       '@tanstack/react-query':
         specifier: ^5.51.23
         version: 5.51.23(react@18.3.1)
+      '@xterm/addon-attach':
+        specifier: ^0.11.0
+        version: 0.11.0(@xterm/xterm@5.5.0)
+      '@xterm/xterm':
+        specifier: ^5.5.0
+        version: 5.5.0
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
@@ -674,6 +680,14 @@ packages:
     resolution: {integrity: sha512-yrknSb3Dci6svCd/qhHqhFPDSw0QtjumcqdKMoNNzmOl5lMXTTiqzjWtG4Qask2HdvvzaNgSunbQGet8/GrKdA==}
     peerDependencies:
       vite: ^4 || ^5
+
+  '@xterm/addon-attach@0.11.0':
+    resolution: {integrity: sha512-JboCN0QAY6ZLY/SSB/Zl2cQ5zW1Eh4X3fH7BnuR1NB7xGRhzbqU2Npmpiw/3zFlxDaU88vtKzok44JKi2L2V2Q==}
+    peerDependencies:
+      '@xterm/xterm': ^5.0.0
+
+  '@xterm/xterm@5.5.0':
+    resolution: {integrity: sha512-hqJHYaQb5OptNunnyAnkHyM8aCjZ1MEIDTQu1iIbbTD/xops91NB5yq1ZK/dC2JDbVWtF23zUtl9JE2NqwT87A==}
 
   acorn-jsx@5.3.2:
     resolution: {integrity: sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==}
@@ -2223,6 +2237,12 @@ snapshots:
       vite: 5.4.0(@types/node@22.2.0)
     transitivePeerDependencies:
       - '@swc/helpers'
+
+  '@xterm/addon-attach@0.11.0(@xterm/xterm@5.5.0)':
+    dependencies:
+      '@xterm/xterm': 5.5.0
+
+  '@xterm/xterm@5.5.0': {}
 
   acorn-jsx@5.3.2(acorn@8.12.1):
     dependencies:

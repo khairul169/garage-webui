@@ -20,4 +20,6 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.3.18 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.11.18 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.17.16 // indirect
+	github.com/coder/websocket v1.8.12 // indirect
+	golang.org/x/net v0.28.0 // indirect
 )
