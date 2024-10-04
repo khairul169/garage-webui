@@ -50,6 +50,7 @@ const PermissionsTab = () => {
             <Table.Head>
               <span>#</span>
               <span>Key</span>
+              <span>Aliases</span>
               <span>Read</span>
               <span>Write</span>
               <span>Owner</span>
@@ -61,6 +62,7 @@ const PermissionsTab = () => {
                 <Table.Row>
                   <span>{idx + 1}</span>
                   <span>{key.name || key.accessKeyId?.substring(0, 8)}</span>
+                  <span>{key.bucketLocalAliases?.join(", ") || "-"}</span>
                   <span>
                     <Checkbox
                       checked={key.permissions?.read}

@@ -5,6 +5,7 @@ export type GetBucketRes = Bucket[];
 export type Bucket = {
   id: string;
   globalAliases: string[];
+  localAliases: LocalAlias[];
   websiteAccess: boolean;
   websiteConfig?: WebsiteConfig | null;
   keys: Key[];
@@ -17,11 +18,16 @@ export type Bucket = {
   quotas: Quotas;
 };
 
+export type LocalAlias = {
+  accessKeyId: string;
+  alias: string;
+};
+
 export type Key = {
   accessKeyId: string;
   name: string;
   permissions: Permissions;
-  bucketLocalAliases: any[];
+  bucketLocalAliases: string[];
 };
 
 export type Permissions = {

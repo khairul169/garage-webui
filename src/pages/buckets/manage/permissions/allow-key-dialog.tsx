@@ -84,7 +84,7 @@ const AllowKeyDialog = ({ currentKeys }: Props) => {
         Allow Key
       </Button>
 
-      <Modal ref={dialogRef} backdrop open={isOpen}>
+      <Modal ref={dialogRef} backdrop open={isOpen} className="max-w-2xl">
         <Modal.Header className="mb-1">Allow Key</Modal.Header>
         <Modal.Body>
           <p>Enter the key you want to allow access to.</p>
@@ -100,6 +100,7 @@ const AllowKeyDialog = ({ currentKeys }: Props) => {
                   />
                   Key
                 </label>
+                <label>Local Aliases</label>
                 <label className="flex items-center gap-2 cursor-pointer">
                   <Checkbox
                     color="primary"
@@ -129,23 +130,31 @@ const AllowKeyDialog = ({ currentKeys }: Props) => {
               <Table.Body>
                 {!keyFields.length ? (
                   <tr>
-                    <td colSpan={4} className="text-center">
+                    <td colSpan={5} className="text-center">
                       No keys found
                     </td>
                   </tr>
                 ) : null}
-                {keyFields.map((field, index) => (
-                  <Table.Row key={field.id}>
-                    <CheckboxField
-                      form={form}
-                      name={`keys.${index}.checked`}
-                      label={field.name || field.keyId?.substring(0, 8)}
-                    />
-                    <CheckboxField form={form} name={`keys.${index}.read`} />
-                    <CheckboxField form={form} name={`keys.${index}.write`} />
-                    <CheckboxField form={form} name={`keys.${index}.owner`} />
-                  </Table.Row>
-                ))}
+                {keyFields.map((field, index) => {
+                  const curKey = bucket.keys.find(
+                    (key) => key.accessKeyId === field.keyId
+                  );
+                  return (
+                    <Table.Row key={field.id}>
+                      <CheckboxField
+                        form={form}
+                        name={`keys.${index}.checked`}
+                        label={field.name || field.keyId?.substring(0, 8)}
+                      />
+                      <span>
+                        {curKey?.bucketLocalAliases?.join(", ") || "-"}
+                      </span>
+                      <CheckboxField form={form} name={`keys.${index}.read`} />
+                      <CheckboxField form={form} name={`keys.${index}.write`} />
+                      <CheckboxField form={form} name={`keys.${index}.owner`} />
+                    </Table.Row>
+                  );
+                })}
               </Table.Body>
             </Table>
           </div>

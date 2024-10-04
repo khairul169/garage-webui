@@ -10,20 +10,27 @@ const BucketsPage = () => {
   const [search, setSearch] = useState("");
 
   const items = useMemo(() => {
-    let buckets = data || [];
+    let buckets =
+      data?.map((bucket) => {
+        return {
+          ...bucket,
+          aliases: [
+            ...(bucket.globalAliases || []),
+            ...(bucket.localAliases?.map((l) => l.alias) || []),
+          ],
+        };
+      }) || [];
 
     if (search?.length > 0) {
       const q = search.toLowerCase();
       buckets = buckets.filter(
         (bucket) =>
           bucket.id.includes(q) ||
-          bucket.globalAliases.find((alias) => alias.includes(q))
+          bucket.aliases.find((alias) => alias.includes(q))
       );
     }
 
-    buckets = buckets.sort((a, b) =>
-      a.globalAliases[0].localeCompare(b.globalAliases[0])
-    );
+    buckets = buckets.sort((a, b) => a.aliases[0].localeCompare(b.aliases[0]));
 
     return buckets;
   }, [data, search]);

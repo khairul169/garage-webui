@@ -4,7 +4,7 @@ import { readableBytes } from "@/lib/utils";
 import Button from "@/components/ui/button";
 
 type Props = {
-  data: Bucket;
+  data: Bucket & { aliases: string[] };
 };
 
 const BucketCard = ({ data }: Props) => {
@@ -15,7 +15,7 @@ const BucketCard = ({ data }: Props) => {
           <ArchiveIcon size={28} className="shrink-0" />
 
           <p className="text-xl font-medium truncate">
-            {data.globalAliases?.join(", ")}
+            {data.aliases?.join(", ")}
           </p>
         </div>
 

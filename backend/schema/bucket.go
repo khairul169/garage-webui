@@ -1,14 +1,15 @@
 package schema
 
 type GetBucketsRes struct {
-	ID            string   `json:"id"`
-	GlobalAliases []string `json:"globalAliases"`
-	LocalAliases  []string `json:"localAliases"`
+	ID            string       `json:"id"`
+	GlobalAliases []string     `json:"globalAliases"`
+	LocalAliases  []LocalAlias `json:"localAliases"`
 }
 
 type Bucket struct {
 	ID                             string        `json:"id"`
 	GlobalAliases                  []string      `json:"globalAliases"`
+	LocalAliases                   []LocalAlias  `json:"localAliases"`
 	WebsiteAccess                  bool          `json:"websiteAccess"`
 	WebsiteConfig                  WebsiteConfig `json:"websiteConfig"`
 	Keys                           []KeyElement  `json:"keys"`
@@ -21,12 +22,17 @@ type Bucket struct {
 	Quotas                         Quotas        `json:"quotas"`
 }
 
+type LocalAlias struct {
+	AccessKeyID string `json:"accessKeyId"`
+	Alias       string `json:"alias"`
+}
+
 type KeyElement struct {
-	AccessKeyID        string        `json:"accessKeyId"`
-	Name               string        `json:"name"`
-	Permissions        Permissions   `json:"permissions"`
-	BucketLocalAliases []interface{} `json:"bucketLocalAliases"`
-	SecretAccessKey    string        `json:"secretAccessKey"`
+	AccessKeyID        string      `json:"accessKeyId"`
+	Name               string      `json:"name"`
+	Permissions        Permissions `json:"permissions"`
+	BucketLocalAliases []string    `json:"bucketLocalAliases"`
+	SecretAccessKey    string      `json:"secretAccessKey"`
 }
 
 type Permissions struct {

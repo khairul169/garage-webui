@@ -34,13 +34,14 @@ func (b *Buckets) GetAll(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			var bucket schema.Bucket
-			if err := json.Unmarshal(body, &bucket); err != nil {
+			var data schema.Bucket
+			if err := json.Unmarshal(body, &data); err != nil {
 				ch <- schema.Bucket{ID: bucket.ID, GlobalAliases: bucket.GlobalAliases}
 				return
 			}
 
-			ch <- bucket
+			data.LocalAliases = bucket.LocalAliases
+			ch <- data
 		}()
 	}
 
