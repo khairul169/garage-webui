@@ -31,7 +31,7 @@ If you install Garage using Docker, you can install this web UI alongside Garage
 ```yml
 services:
   garage:
-    image: dxflrs/garage:v1.0.0
+    image: dxflrs/garage:v1.0.1
     container_name: garage
     volumes:
       - ./garage.toml:/etc/garage.toml
@@ -55,7 +55,7 @@ services:
 Get the latest binary from the [release page](https://github.com/khairul169/garage-webui/releases/latest) according to your OS architecture. For example:
 
 ```sh
-$ wget -O garage-webui https://github.com/khairul169/garage-webui/releases/download/1.0.3/garage-webui-v1.0.3-linux-amd64
+$ wget -O garage-webui https://github.com/khairul169/garage-webui/releases/download/1.0.4/garage-webui-v1.0.4-linux-amd64
 $ chmod +x garage-webui
 $ sudo cp garage-webui /usr/local/bin
 ```
