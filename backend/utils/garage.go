@@ -3,6 +3,7 @@ package utils
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"khairul169/garage-webui/schema"
@@ -71,6 +72,17 @@ func (g *garage) GetS3Endpoint() string {
 	}
 
 	return endpoint
+}
+
+func (g *garage) GetS3Region() string {
+	endpoint := os.Getenv("S3_REGION")
+	if len(endpoint) > 0 {
+		return endpoint
+	}
+	if len(g.Config.S3API.S3Region) == 0 {
+		return "garage"
+	}
+	return g.Config.S3API.S3Region
 }
 
 func (g *garage) GetAdminKey() string {
@@ -153,7 +165,7 @@ func (g *garage) Fetch(url string, options *FetchOptions) ([]byte, error) {
 			message = fmt.Sprintf("%v", data["message"])
 		}
 
-		return nil, fmt.Errorf(message)
+		return nil, errors.New(message)
 	}
 
 	body, err := io.ReadAll(res.Body)

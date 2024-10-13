@@ -16,7 +16,7 @@ func main() {
 	utils.InitCacheManager()
 
 	if err := utils.Garage.LoadConfig(); err != nil {
-		log.Fatal("Failed to load config! ", err)
+		log.Println("Cannot load garage config!", err)
 	}
 
 	http.Handle("/api/", http.StripPrefix("/api", router.HandleApiRouter()))

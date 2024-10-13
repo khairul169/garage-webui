@@ -300,7 +300,7 @@ func getS3Client(bucket string) (*s3.Client, error) {
 
 	awsConfig := aws.Config{
 		Credentials:  creds,
-		Region:       "garage",
+		Region:       utils.Garage.GetS3Region(),
 		BaseEndpoint: aws.String(utils.Garage.GetS3Endpoint()),
 	}
 
