@@ -1,10 +1,16 @@
-import { Table } from "react-daisyui";
+import { Alert, Loading, Table } from "react-daisyui";
 import { useBrowseObjects } from "./hooks";
 import { dayjs, readableBytes } from "@/lib/utils";
 import mime from "mime/lite";
 import { Object } from "./types";
 import { API_URL } from "@/lib/api";
-import { FileArchive, FileIcon, FileType, Folder } from "lucide-react";
+import {
+  CircleXIcon,
+  FileArchive,
+  FileIcon,
+  FileType,
+  Folder,
+} from "lucide-react";
 import { useBucketContext } from "../context";
 import ObjectActions from "./object-actions";
 import GotoTopButton from "@/components/ui/goto-top-btn";
@@ -16,7 +22,10 @@ type Props = {
 
 const ObjectList = ({ prefix, onPrefixChange }: Props) => {
   const { bucketName } = useBucketContext();
-  const { data } = useBrowseObjects(bucketName, { prefix, limit: 1000 });
+  const { data, error, isLoading } = useBrowseObjects(bucketName, {
+    prefix,
+    limit: 1000,
+  });
 
   const onObjectClick = (object: Object) => {
     window.open(API_URL + object.viewUrl, "_blank");
@@ -32,13 +41,29 @@ const ObjectList = ({ prefix, onPrefixChange }: Props) => {
         </Table.Head>
 
         <Table.Body>
-          {!data?.prefixes?.length && !data?.objects?.length && (
+          {isLoading ? (
             <tr>
-              <td className="text-center py-8" colSpan={3}>
+              <td colSpan={3}>
+                <div className="h-[250px] flex items-center justify-center">
+                  <Loading />
+                </div>
+              </td>
+            </tr>
+          ) : error ? (
+            <tr>
+              <td colSpan={3}>
+                <Alert status="error" icon={<CircleXIcon />}>
+                  <span>{error.message}</span>
+                </Alert>
+              </td>
+            </tr>
+          ) : !data?.prefixes?.length && !data?.objects?.length ? (
+            <tr>
+              <td className="text-center py-16" colSpan={3}>
                 No objects
               </td>
             </tr>
-          )}
+          ) : null}
 
           {data?.prefixes.map((prefix) => (
             <tr
