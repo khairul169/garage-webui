@@ -73,8 +73,7 @@ func (b *Browse) GetObjects(w http.ResponseWriter, r *http.Request) {
 			ObjectKey:    &key,
 			LastModified: object.LastModified,
 			Size:         object.Size,
-			ViewUrl:      fmt.Sprintf("/browse/%s/%s?view=1", bucket, *object.Key),
-			DownloadUrl:  fmt.Sprintf("/browse/%s/%s?dl=1", bucket, *object.Key),
+			Url:          fmt.Sprintf("/browse/%s/%s", bucket, *object.Key),
 		})
 	}
 
@@ -84,12 +83,26 @@ func (b *Browse) GetObjects(w http.ResponseWriter, r *http.Request) {
 func (b *Browse) GetOneObject(w http.ResponseWriter, r *http.Request) {
 	bucket := r.PathValue("bucket")
 	key := r.PathValue("key")
-	view := r.URL.Query().Get("view") == "1"
-	download := r.URL.Query().Get("dl") == "1"
+	queryParams := r.URL.Query()
+	view := queryParams.Get("view") == "1"
+	thumbnail := queryParams.Get("thumb") == "1"
+	download := queryParams.Get("dl") == "1"
 
 	client, err := getS3Client(bucket)
 	if err != nil {
 		utils.ResponseError(w, err)
+		return
+	}
+
+	if !view && !download && !thumbnail {
+		object, err := client.HeadObject(context.Background(), &s3.HeadObjectInput{
+			Bucket: aws.String(bucket),
+			Key:    aws.String(key),
+		})
+		if err != nil {
+			utils.ResponseError(w, err)
+		}
+		utils.ResponseSuccess(w, object)
 		return
 	}
 
@@ -109,31 +122,42 @@ func (b *Browse) GetOneObject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if view || download {
-		defer object.Body.Close()
-		keys := strings.Split(key, "/")
+	defer object.Body.Close()
+	keys := strings.Split(key, "/")
 
-		w.Header().Set("Content-Type", *object.ContentType)
-		w.Header().Set("Content-Length", strconv.FormatInt(*object.ContentLength, 10))
-		w.Header().Set("Cache-Control", "max-age=86400")
-		w.Header().Set("Last-Modified", object.LastModified.Format(time.RFC1123))
-		w.Header().Set("Etag", *object.ETag)
-
-		if download {
-			w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", keys[len(keys)-1]))
-		}
-
-		w.WriteHeader(http.StatusOK)
-		_, err = io.Copy(w, object.Body)
-
+	if download {
+		w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", keys[len(keys)-1]))
+	} else if thumbnail {
+		body, err := io.ReadAll(object.Body)
 		if err != nil {
 			utils.ResponseError(w, err)
 			return
 		}
+
+		thumb, err := utils.CreateThumbnailImage(body, 64, 64)
+		if err != nil {
+
+			utils.ResponseError(w, err)
+			return
+		}
+
+		w.Header().Set("Content-Type", "image/png")
+		w.Write(thumb)
 		return
 	}
 
-	utils.ResponseSuccess(w, object)
+	w.Header().Set("Content-Type", *object.ContentType)
+	w.Header().Set("Content-Length", strconv.FormatInt(*object.ContentLength, 10))
+	w.Header().Set("Cache-Control", "max-age=86400")
+	w.Header().Set("Last-Modified", object.LastModified.Format(time.RFC1123))
+	w.Header().Set("Etag", *object.ETag)
+
+	_, err = io.Copy(w, object.Body)
+
+	if err != nil {
+		utils.ResponseError(w, err)
+		return
+	}
 }
 
 func (b *Browse) PutObject(w http.ResponseWriter, r *http.Request) {

@@ -15,8 +15,7 @@ export type Object = {
   objectKey: string;
   lastModified: Date;
   size: number;
-  viewUrl: string;
-  downloadUrl: string;
+  url: string;
 };
 
 export type PutObjectPayload = {

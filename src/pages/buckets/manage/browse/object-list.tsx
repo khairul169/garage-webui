@@ -28,11 +28,11 @@ const ObjectList = ({ prefix, onPrefixChange }: Props) => {
   });
 
   const onObjectClick = (object: Object) => {
-    window.open(API_URL + object.viewUrl, "_blank");
+    window.open(API_URL + object.url + "?view=1", "_blank");
   };
 
   return (
-    <div className="overflow-x-auto overflow-y-hidden">
+    <div className="overflow-x-auto min-h-[400px]">
       <Table>
         <Table.Head>
           <span>Name</span>
@@ -44,7 +44,7 @@ const ObjectList = ({ prefix, onPrefixChange }: Props) => {
           {isLoading ? (
             <tr>
               <td colSpan={3}>
-                <div className="h-[250px] flex items-center justify-center">
+                <div className="h-[320px] flex items-center justify-center">
                   <Loading />
                 </div>
               </td>
@@ -84,7 +84,7 @@ const ObjectList = ({ prefix, onPrefixChange }: Props) => {
                 </span>
               </td>
               <td colSpan={2} />
-              <ObjectActions object={{ objectKey: prefix, downloadUrl: "" }} />
+              <ObjectActions object={{ objectKey: prefix, url: "" }} />
             </tr>
           ))}
 
@@ -121,7 +121,9 @@ const ObjectList = ({ prefix, onPrefixChange }: Props) => {
                 <ObjectActions
                   prefix={data.prefix}
                   object={object}
-                  end={idx >= data.objects.length - 2}
+                  end={
+                    idx >= data.objects.length - 2 && data.objects.length > 5
+                  }
                 />
               </tr>
             );
@@ -150,9 +152,10 @@ const FilePreview = ({ ext, object }: FilePreviewProps) => {
   }
 
   if (type === "image") {
+    const thumbnailSupport = ["jpg", "jpeg", "png", "gif"].includes(ext || "");
     return (
       <img
-        src={API_URL + object.viewUrl}
+        src={API_URL + object.url + (thumbnailSupport ? "?thumb=1" : "?view=1")}
         alt={object.objectKey}
         className="size-5 object-cover overflow-hidden mr-2"
       />

@@ -12,7 +12,7 @@ import { shareDialog } from "./share-dialog";
 
 type Props = {
   prefix?: string;
-  object: Pick<Object, "objectKey" | "downloadUrl">;
+  object: Pick<Object, "objectKey" | "url">;
   end?: boolean;
 };
 
@@ -30,7 +30,7 @@ const ObjectActions = ({ prefix = "", object, end }: Props) => {
   });
 
   const onDownload = () => {
-    window.open(API_URL + object.downloadUrl, "_blank");
+    window.open(API_URL + object.url + "?dl=1", "_blank");
   };
 
   const onDelete = () => {
