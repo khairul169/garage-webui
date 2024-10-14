@@ -55,7 +55,7 @@ services:
 Get the latest binary from the [release page](https://github.com/khairul169/garage-webui/releases/latest) according to your OS architecture. For example:
 
 ```sh
-$ wget -O garage-webui https://github.com/khairul169/garage-webui/releases/download/1.0.4/garage-webui-v1.0.4-linux-amd64
+$ wget -O garage-webui https://github.com/khairul169/garage-webui/releases/download/1.0.5/garage-webui-v1.0.5-linux-amd64
 $ chmod +x garage-webui
 $ sudo cp garage-webui /usr/local/bin
 ```
@@ -134,6 +134,8 @@ However, if it fails to load, you can set these environment variables instead:
 - `CONFIG_PATH`: Path to the Garage `config.toml` file. Defaults to `/etc/garage.toml`.
 - `API_BASE_URL`: Garage admin API endpoint URL.
 - `API_ADMIN_KEY`: Admin API key.
+- `S3_REGION`: S3 Region.
+- `S3_ENDPOINT_URL`: S3 Endpoint url.
 
 ### Running
 
