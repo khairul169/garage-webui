@@ -38,7 +38,11 @@ services:
       - ./meta:/var/lib/garage/meta
       - ./data:/var/lib/garage/data
     restart: unless-stopped
-    network_mode: host
+    ports:
+       - 3900:3900
+       - 3901:3901
+       - 3902:3903
+       - 3903:3903
 
   webui:
     image: khairul169/garage-webui:latest
@@ -48,6 +52,9 @@ services:
       - ./garage.toml:/etc/garage.toml:ro
     ports:
       - 3909:3909
+    environment:
+      API_BASE_URL: "http://garage:3903"
+      S3_ENDPOINT_URL: "http://garage:3900"
 ```
 
 ### Without Docker
