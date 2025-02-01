@@ -2,9 +2,22 @@ import Page from "@/context/page-context";
 import { useClusterStatus } from "./hooks";
 import { Card } from "react-daisyui";
 import NodesList from "./components/nodes-list";
+import { useMemo } from "react";
 
 const ClusterPage = () => {
   const { data } = useClusterStatus();
+  const nodes = useMemo(() => {
+    if (!data) return [];
+
+    if (Array.isArray(data.knownNodes)) {
+      return data.knownNodes.map((node) => ({
+        ...node,
+        role: data.layout?.roles.find((role) => role.id === node.id),
+      }));
+    }
+
+    return data.nodes || [];
+  }, [data]);
 
   return (
     <div className="container">
@@ -18,7 +31,10 @@ const ClusterPage = () => {
           <DetailItem title="Version" value={data?.garageVersion} />
           {/* <DetailItem title="Rust version" value={data?.rustVersion} /> */}
           <DetailItem title="DB engine" value={data?.dbEngine} />
-          <DetailItem title="Layout version" value={data?.layoutVersion} />
+          <DetailItem
+            title="Layout version"
+            value={data?.layoutVersion || data?.layout?.version}
+          />
         </Card.Body>
       </Card>
 
@@ -26,7 +42,7 @@ const ClusterPage = () => {
         <Card.Body>
           <Card.Title>Nodes</Card.Title>
 
-          <NodesList nodes={data?.nodes || []} />
+          <NodesList nodes={nodes} />
         </Card.Body>
       </Card>
     </div>

@@ -268,7 +268,9 @@ const NodesList = ({ nodes }: NodeListProps) => {
 
                 <Dropdown
                   end
-                  vertical={idx >= items.length - 2 ? "top" : "bottom"}
+                  vertical={
+                    idx > 2 && idx >= items.length - 2 ? "top" : "bottom"
+                  }
                 >
                   <Dropdown.Toggle button={false}>
                     <Button shape="circle" color="ghost">
