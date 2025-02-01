@@ -66,7 +66,8 @@ const AssignNodeDialog = () => {
   }, [data]);
 
   const zoneList = useMemo(() => {
-    const list = cluster?.nodes
+    const nodes = cluster?.nodes || cluster?.knownNodes || [];
+    const list = nodes
       .flatMap((i) => {
         const role = layout?.roles.find((role) => role.id === i.id);
         const staged = layout?.stagedRoleChanges.find(
@@ -83,7 +84,8 @@ const AssignNodeDialog = () => {
   }, [cluster, layout]);
 
   const tagsList = useMemo(() => {
-    const list = cluster?.nodes
+    const nodes = cluster?.nodes || cluster?.knownNodes || [];
+    const list = nodes
       .flatMap((i) => {
         const role = layout?.roles.find((role) => role.id === i.id);
         const staged = layout?.stagedRoleChanges.find(

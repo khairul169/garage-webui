@@ -7,7 +7,9 @@ export type GetStatusResult = {
   rustVersion: string;
   dbEngine: string;
   layoutVersion: number;
-  nodes: Node[];
+  nodes?: Node[];
+  knownNodes?: Node[];
+  layout?: GetClusterLayoutResult;
 };
 
 export type Node = {
@@ -17,9 +19,9 @@ export type Node = {
   hostname: string;
   isUp: boolean;
   lastSeenSecsAgo: number | null;
-  draining: boolean;
-  dataPartition: DataPartition;
-  metadataPartition: DataPartition;
+  draining?: boolean;
+  dataPartition?: DataPartition;
+  metadataPartition?: DataPartition;
 };
 
 export type DataPartition = {
