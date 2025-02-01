@@ -39,10 +39,10 @@ services:
       - ./data:/var/lib/garage/data
     restart: unless-stopped
     ports:
-       - 3900:3900
-       - 3901:3901
-       - 3902:3903
-       - 3903:3903
+      - 3900:3900
+      - 3901:3901
+      - 3902:3903
+      - 3903:3903
 
   webui:
     image: khairul169/garage-webui:latest
@@ -62,7 +62,7 @@ services:
 Get the latest binary from the [release page](https://github.com/khairul169/garage-webui/releases/latest) according to your OS architecture. For example:
 
 ```sh
-$ wget -O garage-webui https://github.com/khairul169/garage-webui/releases/download/1.0.5/garage-webui-v1.0.5-linux-amd64
+$ wget -O garage-webui https://github.com/khairul169/garage-webui/releases/download/1.0.6/garage-webui-v1.0.6-linux-amd64
 $ chmod +x garage-webui
 $ sudo cp garage-webui /usr/local/bin
 ```
