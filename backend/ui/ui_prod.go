@@ -13,11 +13,11 @@ import (
 //go:embed dist
 var embeddedFs embed.FS
 
-func ServeUI() {
+func ServeUI(mux *http.ServeMux) {
 	distFs, _ := fs.Sub(embeddedFs, "dist")
 	fileServer := http.FileServer(http.FS(distFs))
 
-	http.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	mux.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		_path := path.Clean(r.URL.Path)[1:]
 
 		// Rewrite non-existing paths to index.html

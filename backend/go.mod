@@ -1,6 +1,8 @@
 module khairul169/garage-webui
 
-go 1.22.5
+go 1.23.0
+
+toolchain go1.24.0
 
 require (
 	github.com/aws/aws-sdk-go-v2 v1.30.4
@@ -13,6 +15,7 @@ require (
 )
 
 require (
+	github.com/alexedwards/scs/v2 v2.8.0 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.6.4 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.3.16 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.6.16 // indirect
@@ -21,4 +24,5 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.3.18 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.11.18 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.17.16 // indirect
+	golang.org/x/crypto v0.35.0
 )

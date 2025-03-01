@@ -4,6 +4,7 @@ import {
   HardDrive,
   KeySquare,
   LayoutDashboard,
+  LogOut,
   Palette,
 } from "lucide-react";
 import { Dropdown, Menu } from "react-daisyui";
@@ -12,6 +13,10 @@ import Button from "../ui/button";
 import { themes } from "@/app/themes";
 import appStore from "@/stores/app-store";
 import garageLogo from "@/assets/garage-logo.svg";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import api from "@/lib/api";
+import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
 
 const pages = [
   { icon: LayoutDashboard, title: "Dashboard", path: "/", exact: true },
@@ -22,6 +27,7 @@ const pages = [
 
 const Sidebar = () => {
   const { pathname } = useLocation();
+  const auth = useAuth();
 
   return (
     <aside className="bg-base-100 border-r border-base-300/30 w-[80%] md:w-[250px] flex flex-col items-stretch overflow-hidden h-full">
@@ -57,22 +63,49 @@ const Sidebar = () => {
         })}
       </Menu>
 
-      <Dropdown className="my-2 mx-4" vertical="top">
-        <Dropdown.Toggle button={false}>
-          <Button icon={Palette} color="ghost">
-            Theme
-          </Button>
-        </Dropdown.Toggle>
+      <div className="py-2 px-4 flex items-center gap-2">
+        <Dropdown vertical="top">
+          <Dropdown.Toggle button={false}>
+            <Button icon={Palette} color="ghost">
+              {!auth.isEnabled ? "Theme" : null}
+            </Button>
+          </Dropdown.Toggle>
 
-        <Dropdown.Menu className="max-h-[200px] overflow-y-auto">
-          {themes.map((theme) => (
-            <Dropdown.Item key={theme} onClick={() => appStore.setTheme(theme)}>
-              {ucfirst(theme)}
-            </Dropdown.Item>
-          ))}
-        </Dropdown.Menu>
-      </Dropdown>
+          <Dropdown.Menu className="max-h-[500px] overflow-y-auto">
+            {themes.map((theme) => (
+              <Dropdown.Item
+                key={theme}
+                onClick={() => appStore.setTheme(theme)}
+              >
+                {ucfirst(theme)}
+              </Dropdown.Item>
+            ))}
+          </Dropdown.Menu>
+        </Dropdown>
+
+        {auth.isEnabled ? <LogoutButton /> : null}
+      </div>
     </aside>
+  );
+};
+
+const LogoutButton = () => {
+  const queryClient = useQueryClient();
+
+  const logout = useMutation({
+    mutationFn: () => api.post("/auth/logout"),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["auth"] });
+    },
+    onError: (err) => {
+      toast.error(err?.message || "Unknown error");
+    },
+  });
+
+  return (
+    <Button className="flex-1" icon={LogOut} onClick={() => logout.mutate()}>
+      Logout
+    </Button>
   );
 };
 

@@ -144,6 +144,25 @@ However, if it fails to load, you can set these environment variables instead:
 - `S3_REGION`: S3 Region.
 - `S3_ENDPOINT_URL`: S3 Endpoint url.
 
+### Authentication
+
+Enable authentication by setting `AUTH_USER_PASS` environment variable. Generate the username and password hash using the following command:
+
+```bash
+htpasswd -nbBC 10 "YOUR_USERNAME" "YOUR_PASSWORD"
+```
+
+> If command 'htpasswd' is not found, install `apache2-utils` using your package manager.
+
+Then update your `docker-compose.yml`:
+
+```yml
+webui:
+  ....
+  environment:
+    AUTH_USER_PASS: "username:$2y$10$DSTi9o..."
+```
+
 ### Running
 
 Once your instance of Garage Web UI is started, you can open the web UI at http://your-ip:3909. You can place it behind a reverse proxy to secure it with SSL.

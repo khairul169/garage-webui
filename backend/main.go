@@ -12,15 +12,18 @@ import (
 )
 
 func main() {
+	// Initialize app
 	godotenv.Load()
 	utils.InitCacheManager()
+	sessionMgr := utils.InitSessionManager()
 
 	if err := utils.Garage.LoadConfig(); err != nil {
 		log.Println("Cannot load garage config!", err)
 	}
 
-	http.Handle("/api/", http.StripPrefix("/api", router.HandleApiRouter()))
-	ui.ServeUI()
+	mux := http.NewServeMux()
+	mux.Handle("/api/", http.StripPrefix("/api", router.HandleApiRouter()))
+	ui.ServeUI(mux)
 
 	host := utils.GetEnv("HOST", "0.0.0.0")
 	port := utils.GetEnv("PORT", "3909")
@@ -28,7 +31,7 @@ func main() {
 	addr := fmt.Sprintf("%s:%s", host, port)
 	log.Printf("Starting server on http://%s", addr)
 
-	if err := http.ListenAndServe(addr, nil); err != nil {
+	if err := http.ListenAndServe(addr, sessionMgr.LoadAndSave(mux)); err != nil {
 		log.Fatal(err)
 	}
 }

@@ -3,4 +3,6 @@
 
 package ui
 
-func ServeUI() {}
+import "net/http"
+
+func ServeUI(mux *http.ServeMux) {}

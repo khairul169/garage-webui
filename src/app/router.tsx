@@ -1,8 +1,9 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { lazy } from "react";
+import { lazy, Suspense } from "react";
 import AuthLayout from "@/components/layouts/auth-layout";
 import MainLayout from "@/components/layouts/main-layout";
 
+const LoginPage = lazy(() => import("@/pages/auth/login"));
 const ClusterPage = lazy(() => import("@/pages/cluster/page"));
 const HomePage = lazy(() => import("@/pages/home/page"));
 const BucketsPage = lazy(() => import("@/pages/buckets/page"));
@@ -13,6 +14,12 @@ const router = createBrowserRouter([
   {
     path: "/auth",
     Component: AuthLayout,
+    children: [
+      {
+        path: "login",
+        Component: LoginPage,
+      },
+    ],
   },
   {
     path: "/",
@@ -42,7 +49,11 @@ const router = createBrowserRouter([
 ]);
 
 const Router = () => {
-  return <RouterProvider router={router} />;
+  return (
+    <Suspense>
+      <RouterProvider router={router} />
+    </Suspense>
+  );
 };
 
 export default Router;

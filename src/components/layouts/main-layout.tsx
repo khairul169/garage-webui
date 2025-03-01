@@ -1,21 +1,31 @@
 import { PageContext } from "@/context/page-context";
 import { Suspense, useContext, useEffect } from "react";
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
 import Sidebar from "../containers/sidebar";
 import { ArrowLeft, MenuIcon } from "lucide-react";
 import Button from "../ui/button";
 import { useDisclosure } from "@/hooks/useDisclosure";
 import { Drawer } from "react-daisyui";
+import { useAuth } from "@/hooks/useAuth";
 
 const MainLayout = () => {
   const sidebar = useDisclosure();
   const { pathname } = useLocation();
+  const auth = useAuth();
 
   useEffect(() => {
     if (sidebar.isOpen) {
       sidebar.onClose();
     }
   }, [pathname]);
+
+  if (auth.isLoading) {
+    return null;
+  }
+
+  if (!auth.isAuthenticated) {
+    return <Navigate to="/auth/login" />;
+  }
 
   return (
     <Drawer

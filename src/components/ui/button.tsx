@@ -4,6 +4,7 @@ import { Button as BaseButton } from "react-daisyui";
 import { Link } from "react-router-dom";
 
 type ButtonProps = ComponentPropsWithoutRef<typeof BaseButton> & {
+  type?: HTMLButtonElement["type"];
   href?: string;
   target?: "_blank" | "_self" | "_parent" | "_top";
   icon?: LucideIcon;
