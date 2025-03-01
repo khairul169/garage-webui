@@ -6,6 +6,16 @@ type FetchOptions = Omit<RequestInit, "headers" | "body"> & {
 
 export const API_URL = "/api";
 
+export class APIError extends Error {
+  status!: number;
+
+  constructor(message: string, status: number = 400) {
+    super(message);
+    this.name = "APIError";
+    this.status = status;
+  }
+}
+
 const api = {
   async fetch<T = any>(url: string, options?: Partial<FetchOptions>) {
     const headers: Record<string, string> = {};
@@ -36,13 +46,18 @@ const api = {
       ?.includes("application/json");
     const data = isJson ? await res.json() : await res.text();
 
+    if (res.status === 401 && !url.startsWith("/auth")) {
+      window.location.href = "/auth/login";
+      throw new APIError("unauthorized", res.status);
+    }
+
     if (!res.ok) {
       const message = isJson
         ? data?.message
         : typeof data === "string"
         ? data
         : res.statusText;
-      throw new Error(message);
+      throw new APIError(message, res.status);
     }
 
     return data as unknown as T;

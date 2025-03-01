@@ -13,7 +13,7 @@ import Button from "../ui/button";
 import { themes } from "@/app/themes";
 import appStore from "@/stores/app-store";
 import garageLogo from "@/assets/garage-logo.svg";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import api from "@/lib/api";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
@@ -90,12 +90,10 @@ const Sidebar = () => {
 };
 
 const LogoutButton = () => {
-  const queryClient = useQueryClient();
-
   const logout = useMutation({
     mutationFn: () => api.post("/auth/logout"),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["auth"] });
+      window.location.href = "/auth/login";
     },
     onError: (err) => {
       toast.error(err?.message || "Unknown error");
