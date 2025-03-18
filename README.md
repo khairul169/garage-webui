@@ -41,7 +41,7 @@ services:
     ports:
       - 3900:3900
       - 3901:3901
-      - 3902:3903
+      - 3902:3902
       - 3903:3903
 
   webui:
@@ -136,7 +136,11 @@ admin_token = "YOUR_ADMIN_TOKEN_HERE"
 metrics_token = "YOUR_METRICS_TOKEN_HERE"
 ```
 
-However, if it fails to load, you can set these environment variables instead:
+However, if it fails to load, you can set `API_BASE_URL` & `API_ADMIN_KEY` environment variables instead.
+
+### Environment Variables
+
+Configurable envs:
 
 - `CONFIG_PATH`: Path to the Garage `config.toml` file. Defaults to `/etc/garage.toml`.
 - `BASE_PATH`: Base path or prefix for Web UI.
