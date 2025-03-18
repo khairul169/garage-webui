@@ -15,6 +15,7 @@ import appStore from "@/stores/app-store";
 import garageLogo from "@/assets/garage-logo.svg";
 import { useMutation } from "@tanstack/react-query";
 import api from "@/lib/api";
+import * as utils from "@/lib/utils";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -93,7 +94,7 @@ const LogoutButton = () => {
   const logout = useMutation({
     mutationFn: () => api.post("/auth/logout"),
     onSuccess: () => {
-      window.location.href = "/auth/login";
+      window.location.href = utils.url("/auth/login");
     },
     onError: (err) => {
       toast.error(err?.message || "Unknown error");

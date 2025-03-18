@@ -7,6 +7,7 @@ import (
 	"khairul169/garage-webui/utils"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/joho/godotenv"
 )
@@ -21,9 +22,20 @@ func main() {
 		log.Println("Cannot load garage config!", err)
 	}
 
+	basePath := os.Getenv("BASE_PATH")
 	mux := http.NewServeMux()
-	mux.Handle("/api/", http.StripPrefix("/api", router.HandleApiRouter()))
+
+	// Serve API
+	apiPrefix := basePath + "/api"
+	mux.Handle(apiPrefix+"/", http.StripPrefix(apiPrefix, router.HandleApiRouter()))
+
+	// Static files
 	ui.ServeUI(mux)
+
+	// Redirect to UI if BASE_PATH is set
+	if basePath != "" {
+		mux.Handle("/", http.RedirectHandler(basePath, http.StatusMovedPermanently))
+	}
 
 	host := utils.GetEnv("HOST", "0.0.0.0")
 	port := utils.GetEnv("PORT", "3909")

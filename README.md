@@ -139,6 +139,7 @@ metrics_token = "YOUR_METRICS_TOKEN_HERE"
 However, if it fails to load, you can set these environment variables instead:
 
 - `CONFIG_PATH`: Path to the Garage `config.toml` file. Defaults to `/etc/garage.toml`.
+- `BASE_PATH`: Base path or prefix for Web UI.
 - `API_BASE_URL`: Garage admin API endpoint URL.
 - `API_ADMIN_KEY`: Admin API key.
 - `S3_REGION`: S3 Region.
@@ -146,7 +147,9 @@ However, if it fails to load, you can set these environment variables instead:
 
 ### Authentication
 
-Enable authentication by setting `AUTH_USER_PASS` environment variable. Generate the username and password hash using the following command:
+Enable authentication by setting the `AUTH_USER_PASS` environment variable in the format `username:password_hash`, where `password_hash` is a bcrypt hash of the password.
+
+Generate the username and password hash using the following command:
 
 ```bash
 htpasswd -nbBC 10 "YOUR_USERNAME" "YOUR_PASSWORD"

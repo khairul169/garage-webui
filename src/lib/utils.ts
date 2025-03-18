@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { twMerge } from "tailwind-merge";
 import dayjsRelativeTime from "dayjs/plugin/relativeTime";
 import dayjs from "dayjs";
+import { BASE_PATH } from "./consts";
 
 dayjs.extend(dayjsRelativeTime);
 export { dayjs };
@@ -52,4 +53,8 @@ export const copyToClipboard = async (text: string) => {
   } finally {
     textArea?.remove();
   }
+};
+
+export const url = (...paths: unknown[]) => {
+  return BASE_PATH + paths.join("/");
 };
