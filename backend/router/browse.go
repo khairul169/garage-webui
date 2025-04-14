@@ -146,11 +146,20 @@ func (b *Browse) GetOneObject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", *object.ContentType)
-	w.Header().Set("Content-Length", strconv.FormatInt(*object.ContentLength, 10))
 	w.Header().Set("Cache-Control", "max-age=86400")
 	w.Header().Set("Last-Modified", object.LastModified.Format(time.RFC1123))
-	w.Header().Set("Etag", *object.ETag)
+
+	if object.ContentType != nil {
+		w.Header().Set("Content-Type", *object.ContentType)
+	} else {
+		w.Header().Set("Content-Type", "application/octet-stream")
+	}
+	if object.ContentLength != nil {
+		w.Header().Set("Content-Length", strconv.FormatInt(*object.ContentLength, 10))
+	}
+	if object.ETag != nil {
+		w.Header().Set("Etag", *object.ETag)
+	}
 
 	_, err = io.Copy(w, object.Body)
 
