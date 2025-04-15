@@ -62,7 +62,7 @@ services:
 Get the latest binary from the [release page](https://github.com/khairul169/garage-webui/releases/latest) according to your OS architecture. For example:
 
 ```sh
-$ wget -O garage-webui https://github.com/khairul169/garage-webui/releases/download/1.0.8/garage-webui-v1.0.8-linux-amd64
+$ wget -O garage-webui https://github.com/khairul169/garage-webui/releases/download/1.0.9/garage-webui-v1.0.9-linux-amd64
 $ chmod +x garage-webui
 $ sudo cp garage-webui /usr/local/bin
 ```
