@@ -19,8 +19,10 @@ COPY backend/ ./
 COPY --from=frontend /app/dist ./ui/dist
 RUN make
 
-FROM scratch
+FROM debian:bookworm-slim
 
 COPY --from=backend /app/main /bin/main
+
+RUN apt update && apt install -y ca-certificates && rm -rf /var/lib/apt/lists/*
 
 CMD [ "/bin/main" ]
