@@ -19,10 +19,14 @@ COPY backend/ ./
 COPY --from=frontend /app/dist ./ui/dist
 RUN make
 
-FROM debian:bookworm-slim
+FROM scratch
 
+COPY --from=alpine /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY --from=ghcr.io/tarampampam/curl:8.6.0 /bin/curl /bin/curl
 COPY --from=backend /app/main /bin/main
 
-RUN apt update && apt install -y ca-certificates && rm -rf /var/lib/apt/lists/*
+HEALTHCHECK --interval=5m --timeout=2s --retries=3 --start-period=15s CMD [ \
+    "curl", "--fail", "http://127.0.0.1:3909" \
+]
 
-CMD [ "/bin/main" ]
+ENTRYPOINT [ "main" ]
