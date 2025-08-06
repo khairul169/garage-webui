@@ -14,7 +14,7 @@ import {
 export const useClusterStatus = () => {
   return useQuery({
     queryKey: ["status"],
-    queryFn: () => api.get<GetStatusResult>("/v1/status"),
+    queryFn: () => api.get<GetStatusResult>("/v2/GetClusterStatus"),
   });
 };
 
