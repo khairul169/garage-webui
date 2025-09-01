@@ -10,7 +10,7 @@ import { CreateKeySchema } from "./schema";
 export const useKeys = () => {
   return useQuery({
     queryKey: ["keys"],
-    queryFn: () => api.get<Key[]>("/v1/key?list"),
+    queryFn: () => api.get<Key[]>("/v2/ListKeys"),
   });
 };
 
@@ -20,9 +20,9 @@ export const useCreateKey = (
   return useMutation({
     mutationFn: async (body) => {
       if (body.isImport) {
-        return api.post("/v1/key/import", { body });
+        return api.post("/v2/ImportKey", { body });
       }
-      return api.post("/v1/key", { body });
+      return api.post("/v2/CreateKey", { body });
     },
     ...options,
   });
@@ -32,7 +32,7 @@ export const useRemoveKey = (
   options?: UseMutationOptions<any, Error, string>
 ) => {
   return useMutation({
-    mutationFn: (id) => api.delete("/v1/key", { params: { id } }),
+    mutationFn: (id) => api.post("/v2/DeleteKey", { params: { id } }),
     ...options,
   });
 };

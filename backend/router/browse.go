@@ -292,7 +292,7 @@ func getBucketCredentials(bucket string) (aws.CredentialsProvider, error) {
 		return cacheData.(aws.CredentialsProvider), nil
 	}
 
-	body, err := utils.Garage.Fetch("/v1/bucket?globalAlias="+bucket, &utils.FetchOptions{})
+	body, err := utils.Garage.Fetch("/v2/GetBucketInfo?globalAlias="+bucket, &utils.FetchOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -309,7 +309,7 @@ func getBucketCredentials(bucket string) (aws.CredentialsProvider, error) {
 			continue
 		}
 
-		body, err := utils.Garage.Fetch(fmt.Sprintf("/v1/key?id=%s&showSecretKey=true", k.AccessKeyID), &utils.FetchOptions{})
+		body, err := utils.Garage.Fetch(fmt.Sprintf("/v2/GetKeyInfo?id=%s&showSecretKey=true", k.AccessKeyID), &utils.FetchOptions{})
 		if err != nil {
 			return nil, err
 		}

@@ -1,5 +1,19 @@
 //
 
+export type GetNodeInfoResult = {
+  success: {
+    [key: string]: {
+      nodeId:         string;
+      garageVersion:  string;
+      garageFeatures: string[];
+      rustVersion:    string;
+      dbEngine:       string;
+    };
+  };
+  error:   Error;
+}
+
+
 export type GetStatusResult = {
   node: string;
   garageVersion: string;

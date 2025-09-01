@@ -10,7 +10,7 @@ import { Bucket, Permissions } from "../types";
 export const useBucket = (id?: string | null) => {
   return useQuery({
     queryKey: ["bucket", id],
-    queryFn: () => api.get<Bucket>("/v1/bucket", { params: { id } }),
+    queryFn: () => api.get<Bucket>("/v2/GetBucketInfo", { params: { id } }),
     enabled: !!id,
   });
 };
@@ -18,7 +18,10 @@ export const useBucket = (id?: string | null) => {
 export const useUpdateBucket = (id?: string | null) => {
   return useMutation({
     mutationFn: (values: any) => {
-      return api.put<any>("/v1/bucket", { params: { id }, body: values });
+      return api.post<any>("/v2/UpdateBucket", {
+        params: { id },
+        body: values,
+      });
     },
   });
 };
@@ -29,8 +32,8 @@ export const useAddAlias = (
 ) => {
   return useMutation({
     mutationFn: (alias: string) => {
-      return api.put("/v1/bucket/alias/global", {
-        params: { id: bucketId, alias },
+      return api.post("/v2/AddBucketAlias", {
+        body: { bucketId, globalAlias: alias },
       });
     },
     ...options,
@@ -43,8 +46,8 @@ export const useRemoveAlias = (
 ) => {
   return useMutation({
     mutationFn: (alias: string) => {
-      return api.delete("/v1/bucket/alias/global", {
-        params: { id: bucketId, alias },
+      return api.post("/v2/RemoveBucketAlias", {
+        body: { bucketId, globalAlias: alias },
       });
     },
     ...options,
@@ -62,8 +65,7 @@ export const useAllowKey = (
   return useMutation({
     mutationFn: async (payload) => {
       const promises = payload.map(async (key) => {
-        console.log("test", key);
-        return api.post("/v1/bucket/allow", {
+        return api.post("/v2/AllowBucketKey", {
           body: {
             bucketId,
             accessKeyId: key.keyId,
@@ -88,7 +90,7 @@ export const useDenyKey = (
 ) => {
   return useMutation({
     mutationFn: (payload) => {
-      return api.post("/v1/bucket/deny", {
+      return api.post("/v2/DenyBucketKey", {
         body: {
           bucketId,
           accessKeyId: payload.keyId,
@@ -104,7 +106,7 @@ export const useRemoveBucket = (
   options?: MutationOptions<any, Error, string>
 ) => {
   return useMutation({
-    mutationFn: (id) => api.delete("/v1/bucket", { params: { id } }),
+    mutationFn: (id) => api.post("/v2/DeleteBucket", { params: { id } }),
     ...options,
   });
 };

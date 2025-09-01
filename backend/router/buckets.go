@@ -11,7 +11,7 @@ import (
 type Buckets struct{}
 
 func (b *Buckets) GetAll(w http.ResponseWriter, r *http.Request) {
-	body, err := utils.Garage.Fetch("/v1/bucket?list", &utils.FetchOptions{})
+	body, err := utils.Garage.Fetch("/v2/ListBuckets", &utils.FetchOptions{})
 	if err != nil {
 		utils.ResponseError(w, err)
 		return
@@ -27,7 +27,7 @@ func (b *Buckets) GetAll(w http.ResponseWriter, r *http.Request) {
 
 	for _, bucket := range buckets {
 		go func() {
-			body, err := utils.Garage.Fetch(fmt.Sprintf("/v1/bucket?id=%s", bucket.ID), &utils.FetchOptions{})
+			body, err := utils.Garage.Fetch(fmt.Sprintf("/v2/GetBucketInfo?id=%s", bucket.ID), &utils.FetchOptions{})
 
 			if err != nil {
 				ch <- schema.Bucket{ID: bucket.ID, GlobalAliases: bucket.GlobalAliases}

@@ -3,6 +3,7 @@ import {
   ApplyLayoutResult,
   AssignNodeBody,
   GetClusterLayoutResult,
+  GetNodeInfoResult,
   GetStatusResult,
 } from "./types";
 import {
@@ -10,6 +11,17 @@ import {
   UseMutationOptions,
   useQuery,
 } from "@tanstack/react-query";
+
+export const useNodeInfo = () => {
+  return useQuery({
+    queryKey: ["node-info"],
+    queryFn: () =>
+      api.get<GetNodeInfoResult>("/v2/GetNodeInfo", {
+        params: { node: "self" },
+      }),
+    select: (data) => Object.values(data?.success || {})?.[0],
+  });
+};
 
 export const useClusterStatus = () => {
   return useQuery({
@@ -21,14 +33,16 @@ export const useClusterStatus = () => {
 export const useClusterLayout = () => {
   return useQuery({
     queryKey: ["layout"],
-    queryFn: () => api.get<GetClusterLayoutResult>("/v1/layout"),
+    queryFn: () => api.get<GetClusterLayoutResult>("/v2/GetClusterLayout"),
   });
 };
 
 export const useConnectNode = (options?: Partial<UseMutationOptions>) => {
   return useMutation<any, Error, string>({
     mutationFn: async (nodeId) => {
-      const [res] = await api.post("/v1/connect", { body: [nodeId] });
+      const [res] = await api.post("/v2/ConnectClusterNodes", {
+        body: [nodeId],
+      });
       if (!res.success) {
         throw new Error(res.error || "Unknown error");
       }
@@ -40,7 +54,10 @@ export const useConnectNode = (options?: Partial<UseMutationOptions>) => {
 
 export const useAssignNode = (options?: Partial<UseMutationOptions>) => {
   return useMutation<any, Error, AssignNodeBody>({
-    mutationFn: (data) => api.post("/v1/layout", { body: [data] }),
+    mutationFn: (data) =>
+      api.post("/v2/UpdateClusterLayout", {
+        body: { parameters: null, roles: [data] },
+      }),
     ...(options as any),
   });
 };
@@ -48,15 +65,16 @@ export const useAssignNode = (options?: Partial<UseMutationOptions>) => {
 export const useUnassignNode = (options?: Partial<UseMutationOptions>) => {
   return useMutation<any, Error, string>({
     mutationFn: (nodeId) =>
-      api.post("/v1/layout", { body: [{ id: nodeId, remove: true }] }),
+      api.post("/v2/UpdateClusterLayout", {
+        body: { parameters: null, roles: [{ id: nodeId, remove: true }] },
+      }),
     ...(options as any),
   });
 };
 
 export const useRevertChanges = (options?: Partial<UseMutationOptions>) => {
   return useMutation<any, Error, number>({
-    mutationFn: (version) =>
-      api.post("/v1/layout/revert", { body: { version } }),
+    mutationFn: () => api.post("/v2/RevertClusterLayout"),
     ...(options as any),
   });
 };
@@ -64,7 +82,7 @@ export const useRevertChanges = (options?: Partial<UseMutationOptions>) => {
 export const useApplyChanges = (options?: Partial<UseMutationOptions>) => {
   return useMutation<ApplyLayoutResult, Error, number>({
     mutationFn: (version) =>
-      api.post("/v1/layout/apply", { body: { version } }),
+      api.post("/v2/ApplyClusterLayout", { body: { version } }),
     ...(options as any),
   });
 };

@@ -8,6 +8,9 @@ import "./styles.css";
 
 const App = () => {
   const [queryClient] = useState(() => new QueryClient());
+  const [test, setTest] = useState();
+
+  console.log({test});
 
   return (
     <PageContextProvider>

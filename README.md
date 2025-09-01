@@ -31,7 +31,7 @@ If you install Garage using Docker, you can install this web UI alongside Garage
 ```yml
 services:
   garage:
-    image: dxflrs/garage:v1.0.1
+    image: dxflrs/garage:v2.0.0
     container_name: garage
     volumes:
       - ./garage.toml:/etc/garage.toml

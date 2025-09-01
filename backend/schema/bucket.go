@@ -4,6 +4,7 @@ type GetBucketsRes struct {
 	ID            string       `json:"id"`
 	GlobalAliases []string     `json:"globalAliases"`
 	LocalAliases  []LocalAlias `json:"localAliases"`
+	Created       string       `json:"created"`
 }
 
 type Bucket struct {
@@ -20,6 +21,7 @@ type Bucket struct {
 	UnfinishedMultipartUploadParts int64         `json:"unfinishedMultipartUploadParts"`
 	UnfinishedMultipartUploadBytes int64         `json:"unfinishedMultipartUploadBytes"`
 	Quotas                         Quotas        `json:"quotas"`
+	Created                        string        `json:"created"`
 }
 
 type LocalAlias struct {

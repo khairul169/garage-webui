@@ -1,11 +1,13 @@
 import Page from "@/context/page-context";
-import { useClusterStatus } from "./hooks";
+import { useClusterStatus, useNodeInfo } from "./hooks";
 import { Card } from "react-daisyui";
 import NodesList from "./components/nodes-list";
 import { useMemo } from "react";
 
 const ClusterPage = () => {
   const { data } = useClusterStatus();
+  const { data: node } = useNodeInfo();
+
   const nodes = useMemo(() => {
     if (!data) return [];
 
@@ -27,13 +29,13 @@ const ClusterPage = () => {
         <Card.Body className="gap-1">
           <Card.Title className="mb-2">Details</Card.Title>
 
-          <DetailItem title="Node ID" value={data?.node} />
-          <DetailItem title="Version" value={data?.garageVersion} />
+          {/* <DetailItem title="Node ID" value={node?.nodeId} /> */}
+          <DetailItem title="Garage Version" value={node?.garageVersion} />
           {/* <DetailItem title="Rust version" value={data?.rustVersion} /> */}
-          <DetailItem title="DB engine" value={data?.dbEngine} />
+          <DetailItem title="DB engine" value={node?.dbEngine} />
           <DetailItem
             title="Layout version"
-            value={data?.layoutVersion || data?.layout?.version}
+            value={data?.layoutVersion || data?.layout?.version || "-"}
           />
         </Card.Body>
       </Card>
