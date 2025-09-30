@@ -86,7 +86,7 @@ const CreateFolderAction = ({ prefix }: CreateFolderActionProps) => {
 
   useEffect(() => {
     if (isOpen) form.setFocus("name");
-  }, [isOpen]);
+  }, [isOpen, form]);
 
   const createFolder = usePutObject(bucketName, {
     onSuccess: () => {

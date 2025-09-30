@@ -54,7 +54,7 @@ const AllowKeyDialog = ({ currentKeys }: Props) => {
       }));
 
     form.setValue("keys", _keys || []);
-  }, [keys, currentKeys]);
+  }, [keys, currentKeys, form]);
 
   const onToggleAll = (
     e: React.ChangeEvent<HTMLInputElement>,

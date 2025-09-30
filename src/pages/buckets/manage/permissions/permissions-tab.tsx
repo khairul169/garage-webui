@@ -59,7 +59,7 @@ const PermissionsTab = () => {
 
             <Table.Body>
               {keys?.map((key, idx) => (
-                <Table.Row>
+                <Table.Row key={key.accessKeyId}>
                   <span>{idx + 1}</span>
                   <span>{key.name || key.accessKeyId?.substring(0, 8)}</span>
                   <span>{key.bucketLocalAliases?.join(", ") || "-"}</span>
@@ -68,6 +68,7 @@ const PermissionsTab = () => {
                       checked={key.permissions?.read}
                       color="primary"
                       className="cursor-default"
+                      readOnly
                     />
                   </span>
                   <span>
@@ -75,6 +76,7 @@ const PermissionsTab = () => {
                       checked={key.permissions?.write}
                       color="primary"
                       className="cursor-default"
+                      readOnly
                     />
                   </span>
                   <span>
@@ -82,6 +84,7 @@ const PermissionsTab = () => {
                       checked={key.permissions?.owner}
                       color="primary"
                       className="cursor-default"
+                      readOnly
                     />
                   </span>
                   <Button

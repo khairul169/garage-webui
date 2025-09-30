@@ -8,7 +8,7 @@ import { BASE_PATH } from "./consts";
 dayjs.extend(dayjsRelativeTime);
 export { dayjs };
 
-export const cn = (...args: any[]) => {
+export const cn = (...args: Parameters<typeof clsx>) => {
   return twMerge(clsx(...args));
 };
 

@@ -30,7 +30,7 @@ const BrowseTab = () => {
     const newParams = new URLSearchParams(searchParams);
     newParams.set("prefix", prefix);
     setSearchParams(newParams);
-  }, [curPrefix]);
+  }, [curPrefix, prefixHistory, searchParams, setSearchParams]);
 
   const gotoPrefix = (prefix: string) => {
     const history = prefixHistory.slice(0, curPrefix + 1);

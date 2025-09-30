@@ -1,4 +1,3 @@
-import { createDisclosure } from "@/lib/disclosure";
 import { Alert, Modal } from "react-daisyui";
 import { useBucketContext } from "../context";
 import { useConfig } from "@/hooks/useConfig";
@@ -8,8 +7,7 @@ import Button from "@/components/ui/button";
 import { Copy, FileWarningIcon } from "lucide-react";
 import { copyToClipboard } from "@/lib/utils";
 import Checkbox from "@/components/ui/checkbox";
-
-export const shareDialog = createDisclosure<{ key: string; prefix: string }>();
+import { shareDialog } from "./share-dialog-store";
 
 const ShareDialog = () => {
   const { isOpen, data, dialogRef } = shareDialog.use();
@@ -26,12 +24,12 @@ const ShareDialog = () => {
       bucketName + rootDomain,
       bucketName + rootDomain + `:${websitePort}`,
     ],
-    [bucketName, config?.s3_web]
+    [bucketName, rootDomain, websitePort]
   );
 
   useEffect(() => {
     setDomain(bucketName);
-  }, [domains]);
+  }, [bucketName]);
 
   const url = "http://" + domain + "/" + data?.prefix + data?.key;
 
@@ -60,6 +58,7 @@ const ShareDialog = () => {
             value={url}
             className="w-full pr-12"
             onFocus={(e) => e.target.select()}
+            readOnly
           />
           <Button
             icon={Copy}

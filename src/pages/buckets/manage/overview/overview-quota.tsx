@@ -13,35 +13,48 @@ const QuotaSection = () => {
 
   const form = useForm<QuotaSchema>({
     resolver: zodResolver(quotaSchema),
+    defaultValues: {
+      enabled: false,
+      maxObjects: null,
+      maxSize: null,
+    },
   });
   const isEnabled = useWatch({ control: form.control, name: "enabled" });
 
   const updateMutation = useUpdateBucket(data?.id);
 
-  const onChange = useDebounce((values: DeepPartial<QuotaSchema>) => {
+  const handleChange = useDebounce((values: DeepPartial<QuotaSchema>) => {
     const { enabled } = values;
     const maxObjects = Number(values.maxObjects);
     const maxSize = Math.round(Number(values.maxSize) * 1024 ** 3);
 
-    const data = {
+    const quotaData = {
       maxObjects: enabled && maxObjects > 0 ? maxObjects : null,
       maxSize: enabled && maxSize > 0 ? maxSize : null,
     };
 
-    updateMutation.mutate({ quotas: data });
+    updateMutation.mutate({ quotas: quotaData });
   });
 
+  // Reset form when data changes without triggering watch
   useEffect(() => {
-    form.reset({
-      enabled:
-        data?.quotas?.maxSize != null || data?.quotas?.maxObjects != null,
-      maxSize: data?.quotas?.maxSize ? data?.quotas?.maxSize / 1024 ** 3 : null,
-      maxObjects: data?.quotas?.maxObjects || null,
-    });
+    if (!data) return;
 
-    const { unsubscribe } = form.watch((values) => onChange(values));
-    return unsubscribe;
-  }, [data]);
+    const formValues = {
+      enabled:
+        data.quotas?.maxSize != null || data.quotas?.maxObjects != null,
+      maxSize: data.quotas?.maxSize ? data.quotas?.maxSize / 1024 ** 3 : null,
+      maxObjects: data.quotas?.maxObjects || null,
+    };
+
+    form.reset(formValues, { keepDirty: false });
+  }, [data, form]);
+
+  // Set up form watcher
+  useEffect(() => {
+    const subscription = form.watch(handleChange);
+    return () => subscription.unsubscribe();
+  }, [form, handleChange]);
 
   return (
     <div className="mt-8">

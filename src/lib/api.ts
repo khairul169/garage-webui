@@ -2,9 +2,9 @@ import * as utils from "@/lib/utils";
 import { BASE_PATH } from "./consts";
 
 type FetchOptions = Omit<RequestInit, "headers" | "body"> & {
-  params?: Record<string, any>;
+  params?: Record<string, unknown>;
   headers?: Record<string, string>;
-  body?: any;
+  body?: BodyInit | Record<string, unknown> | unknown[] | null;
 };
 
 export const API_URL = BASE_PATH + "/api";
@@ -20,7 +20,7 @@ export class APIError extends Error {
 }
 
 const api = {
-  async fetch<T = any>(url: string, options?: Partial<FetchOptions>) {
+  async fetch<T = unknown>(url: string, options?: Partial<FetchOptions>) {
     const headers: Record<string, string> = {};
     const _url = new URL(API_URL + url, window.location.origin);
 
@@ -30,16 +30,27 @@ const api = {
       });
     }
 
-    if (
-      typeof options?.body === "object" &&
-      !(options.body instanceof FormData)
-    ) {
-      options.body = JSON.stringify(options.body);
-      headers["Content-Type"] = "application/json";
+    let body: BodyInit | null | undefined = undefined;
+    if (options?.body) {
+      if (
+        (typeof options.body === "object" && !Array.isArray(options.body) &&
+        !(options.body instanceof FormData) &&
+        !(options.body instanceof URLSearchParams) &&
+        !(options.body instanceof ReadableStream) &&
+        !(options.body instanceof ArrayBuffer) &&
+        !(options.body instanceof Blob)) ||
+        Array.isArray(options.body)
+      ) {
+        body = JSON.stringify(options.body);
+        headers["Content-Type"] = "application/json";
+      } else {
+        body = options.body as BodyInit;
+      }
     }
 
     const res = await fetch(_url, {
       ...options,
+      body,
       credentials: "include",
       headers: { ...headers, ...(options?.headers || {}) },
     });
@@ -66,28 +77,28 @@ const api = {
     return data as unknown as T;
   },
 
-  async get<T = any>(url: string, options?: Partial<FetchOptions>) {
+  async get<T = unknown>(url: string, options?: Partial<FetchOptions>) {
     return this.fetch<T>(url, {
       ...options,
       method: "GET",
     });
   },
 
-  async post<T = any>(url: string, options?: Partial<FetchOptions>) {
+  async post<T = unknown>(url: string, options?: Partial<FetchOptions>) {
     return this.fetch<T>(url, {
       ...options,
       method: "POST",
     });
   },
 
-  async put<T = any>(url: string, options?: Partial<FetchOptions>) {
+  async put<T = unknown>(url: string, options?: Partial<FetchOptions>) {
     return this.fetch<T>(url, {
       ...options,
       method: "PUT",
     });
   },
 
-  async delete<T = any>(url: string, options?: Partial<FetchOptions>) {
+  async delete<T = unknown>(url: string, options?: Partial<FetchOptions>) {
     return this.fetch<T>(url, {
       ...options,
       method: "DELETE",

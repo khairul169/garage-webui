@@ -37,52 +37,49 @@ export const useClusterLayout = () => {
   });
 };
 
-export const useConnectNode = (options?: Partial<UseMutationOptions>) => {
-  return useMutation<any, Error, string>({
+export interface ConnectNodeResult {
+  success: boolean;
+  error?: string;
+  // Add other fields if the API returns more data
+}
+
+export const useConnectNode = (options?: Partial<UseMutationOptions<ConnectNodeResult, Error, string>>) => {
+  return useMutation<ConnectNodeResult, Error, string>({
     mutationFn: async (nodeId) => {
-      const [res] = await api.post("/v2/ConnectClusterNodes", {
-        body: [nodeId],
-      });
-      if (!res.success) {
-        throw new Error(res.error || "Unknown error");
-      }
+const res = await api.post<ConnectNodeResult>("/v2/ConnectClusterNodes", { body: [nodeId] });
       return res;
     },
-    ...(options as any),
+    ...options,
   });
 };
 
-export const useAssignNode = (options?: Partial<UseMutationOptions>) => {
-  return useMutation<any, Error, AssignNodeBody>({
-    mutationFn: (data) =>
-      api.post("/v2/UpdateClusterLayout", {
-        body: { parameters: null, roles: [data] },
-      }),
-    ...(options as any),
+export const useAssignNode = (options?: Partial<UseMutationOptions<void, Error, AssignNodeBody>>) => {
+  return useMutation<void, Error, AssignNodeBody>({
+    mutationFn: (data) => api.post("/v2/UpdateClusterLayout", { body: { parameters: data.parameters, roles: data.roles } }),
+    ...options,
   });
 };
 
-export const useUnassignNode = (options?: Partial<UseMutationOptions>) => {
-  return useMutation<any, Error, string>({
+export const useUnassignNode = (options?: Partial<UseMutationOptions<void, Error, string>>) => {
+  return useMutation<void, Error, string>({
     mutationFn: (nodeId) =>
-      api.post("/v2/UpdateClusterLayout", {
-        body: { parameters: null, roles: [{ id: nodeId, remove: true }] },
-      }),
-    ...(options as any),
+api.post("/v2/UpdateClusterLayout", { body: { parameters: null, roles: [{ id: nodeId, remove: true }] } }),
+    ...options,
   });
 };
 
-export const useRevertChanges = (options?: Partial<UseMutationOptions>) => {
-  return useMutation<any, Error, number>({
-    mutationFn: () => api.post("/v2/RevertClusterLayout"),
-    ...(options as any),
+export const useRevertChanges = (options?: Partial<UseMutationOptions<void, Error, number>>) => {
+  return useMutation<void, Error, number>({
+    mutationFn: (version) =>
+      api.post("/v2/RevertClusterLayout", { body: { version } }),
+    ...options,
   });
 };
 
-export const useApplyChanges = (options?: Partial<UseMutationOptions>) => {
+export const useApplyChanges = (options?: Partial<UseMutationOptions<ApplyLayoutResult, Error, number>>) => {
   return useMutation<ApplyLayoutResult, Error, number>({
     mutationFn: (version) =>
       api.post("/v2/ApplyClusterLayout", { body: { version } }),
-    ...(options as any),
+    ...options,
   });
 };

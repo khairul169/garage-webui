@@ -2,7 +2,7 @@
 
 [![image](misc/img/garage-webui.png)](misc/img/garage-webui.png)
 
-A simple admin web UI for [Garage](https://garagehq.deuxfleurs.fr/), a self-hosted, S3-compatible, distributed object storage service.
+A modern admin web UI for [Garage v2](https://garagehq.deuxfleurs.fr/), a self-hosted, S3-compatible, distributed object storage service.
 
 [ [Screenshots](misc/SCREENSHOTS.md) | [Install Garage](https://garagehq.deuxfleurs.fr/documentation/quick-start/) | [Garage Git](https://git.deuxfleurs.fr/Deuxfleurs/garage) ]
 
@@ -21,7 +21,7 @@ The Garage Web UI is available as a single executable binary and docker image. Y
 ### Docker CLI
 
 ```sh
-$ docker run -p 3909:3909 -v ./garage.toml:/etc/garage.toml:ro --restart unless-stopped --name garage-webui khairul169/garage-webui:latest
+docker run -p 3909:3909 -v ./garage.toml:/etc/garage.toml:ro --restart unless-stopped --name garage-webui ghcr.io/khairul169/garage-webui:latest
 ```
 
 ### Docker Compose
@@ -45,7 +45,7 @@ services:
       - 3903:3903
 
   webui:
-    image: khairul169/garage-webui:latest
+    image: ghcr.io/khairul169/garage-webui:latest
     container_name: garage-webui
     restart: unless-stopped
     volumes:
@@ -62,21 +62,21 @@ services:
 Get the latest binary from the [release page](https://github.com/khairul169/garage-webui/releases/latest) according to your OS architecture. For example:
 
 ```sh
-$ wget -O garage-webui https://github.com/khairul169/garage-webui/releases/download/1.1.0/garage-webui-v1.1.0-linux-amd64
-$ chmod +x garage-webui
-$ sudo cp garage-webui /usr/local/bin
+wget -O garage-webui https://github.com/khairul169/garage-webui/releases/download/1.1.0/garage-webui-v1.1.0-linux-amd64
+chmod +x garage-webui
+sudo cp garage-webui /usr/local/bin
 ```
 
 Run the program with specified `garage.toml` config path.
 
 ```sh
-$ CONFIG_PATH=./garage.toml garage-webui
+CONFIG_PATH=./garage.toml garage-webui
 ```
 
 If you want to run the program at startup, you may want to create a systemd service.
 
 ```sh
-$ sudo nano /etc/systemd/system/garage-webui.service
+sudo nano /etc/systemd/system/garage-webui.service
 ```
 
 ```
@@ -97,27 +97,26 @@ WantedBy=default.target
 Then reload and start the garage-webui service.
 
 ```sh
-$ sudo systemctl daemon-reload
-$ sudo systemctl enable --now garage-webui
+sudo systemctl daemon-reload
+sudo systemctl enable --now garage-webui
 ```
 
 ### Configuration
 
 To simplify installation, the Garage Web UI uses values from the Garage configuration, such as `rpc_public_addr`, `admin.admin_token`, `s3_web.root_domain`, etc.
 
-Example content of `config.toml`:
+Example content of `garage.toml` for Garage v2:
 
 ```toml
 metadata_dir = "/var/lib/garage/meta"
 data_dir = "/var/lib/garage/data"
 db_engine = "sqlite"
-metadata_auto_snapshot_interval = "6h"
 
 replication_factor = 3
 compression_level = 2
 
 rpc_bind_addr = "[::]:3901"
-rpc_public_addr = "localhost:3901" # Required
+rpc_public_addr = "localhost:3901" # Required for Web UI
 rpc_secret = "YOUR_RPC_SECRET_HERE"
 
 [s3_api]
@@ -130,7 +129,7 @@ bind_addr = "[::]:3902"
 root_domain = ".web.domain.com"
 index = "index.html"
 
-[admin] # Required
+[admin] # Required for Web UI
 api_bind_addr = "[::]:3903"
 admin_token = "YOUR_ADMIN_TOKEN_HERE"
 metrics_token = "YOUR_METRICS_TOKEN_HERE"
@@ -181,29 +180,38 @@ This project is bootstrapped using TypeScript & React for the UI, and Go for bac
 ### Setup
 
 ```sh
-$ git clone https://github.com/khairul169/garage-webui.git
-$ cd garage-webui && pnpm install
-$ cd backend && pnpm install && cd ..
+git clone https://github.com/khairul169/garage-webui.git
+cd garage-webui && pnpm install
+cd backend && pnpm install && cd ..
 ```
 
-### Running
+### Development with Docker
 
-Start both the client and server concurrently:
+For development with Docker, a `docker-compose.dev.yml` file is provided with 4 Garage v2 instances:
 
 ```sh
-$ pnpm run dev # or npm run dev
+# Create necessary directories for Garage data
+mkdir -p dev.local/data-garage/meta dev.local/data-garage/data
+mkdir -p dev.local/data-garage2/meta dev.local/data-garage2/data
+mkdir -p dev.local/data-garage3/meta dev.local/data-garage3/data
+mkdir -p dev.local/data-garage4/meta dev.local/data-garage4/data
+
+# Generate a secure RPC secret using OpenSSL
+# The rpc_secret is used to secure communication between Garage nodes
+RPC_SECRET=$(openssl rand -hex 32)
+echo "Generated RPC secret: $RPC_SECRET"
+
+# Copy the template configuration files and replace CONTAINER_NAME with the actual container name
+# Using sed with empty string after -i for macOS compatibility
+cp garage.toml.template dev.local/garage.toml && sed -i '' "s/CONTAINER_NAME/garage/g; s/dev-garage-secret/$RPC_SECRET/g" dev.local/garage.toml
+cp garage.toml.template dev.local/garage2.toml && sed -i '' "s/CONTAINER_NAME/garage2/g; s/dev-garage-secret/$RPC_SECRET/g" dev.local/garage2.toml
+cp garage.toml.template dev.local/garage3.toml && sed -i '' "s/CONTAINER_NAME/garage3/g; s/dev-garage-secret/$RPC_SECRET/g" dev.local/garage3.toml
+cp garage.toml.template dev.local/garage4.toml && sed -i '' "s/CONTAINER_NAME/garage4/g; s/dev-garage-secret/$RPC_SECRET/g" dev.local/garage4.toml
+
+# Setup environment variables
+cp .env.example .env
+cp backend/.env.example backend/.env
+
+# Start the Garage containers
+docker-compose -f docker-compose.dev.yml up -d
 ```
-
-Or start each instance separately:
-
-```sh
-$ pnpm run dev:client
-$ cd backend
-$ pnpm run dev:server
-```
-
-## Troubleshooting
-
-Make sure you are using the latest version of Garage. If the data cannot be loaded, please check whether your instance of Garage has the admin API enabled and the ports are accessible.
-
-If you encounter any problems, please do not hesitate to submit an issue [here](https://github.com/khairul169/garage-webui/issues). You can describe the problem and attach the error logs.

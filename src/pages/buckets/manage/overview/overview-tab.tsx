@@ -28,7 +28,7 @@ const OverviewTab = () => {
             <div className="flex-1">
               <p className="text-sm flex items-center gap-1">Storage</p>
               <p className="text-2xl font-medium">
-                {readableBytes(data?.bytes)}
+                {data?.bytes != null ? readableBytes(data.bytes) : "n/a"}
               </p>
             </div>
           </div>
@@ -37,7 +37,9 @@ const OverviewTab = () => {
             <ChartScatter className="mt-1" size={20} />
             <div className="flex-1">
               <p className="text-sm flex items-center gap-1">Objects</p>
-              <p className="text-2xl font-medium">{data?.objects}</p>
+              <p className="text-2xl font-medium">
+                {data?.objects != null ? data.objects.toLocaleString() : "n/a"}
+              </p>
             </div>
           </div>
         </div>

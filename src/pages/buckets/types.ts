@@ -7,7 +7,29 @@ export type Bucket = {
   globalAliases: string[];
   localAliases: LocalAlias[];
   websiteAccess: boolean;
-  websiteConfig?: WebsiteConfig | null;
+  websiteConfig: {
+    indexDocument: string | null;
+    errorDocument: string | null;
+  };
+  keys: Key[];
+  objects: number;
+  bytes: number;
+  unfinishedUploads: number;
+  unfinishedMultipartUploads: number;
+  unfinishedMultipartUploadParts: number;
+  unfinishedMultipartUploadBytes: number;
+  quotas: Quotas;
+};
+
+export type UpdateBucket = {
+  id: string;
+  globalAliases: string[];
+  localAliases: LocalAlias[];
+  websiteAccess: {
+    enabled: boolean;
+    indexDocument: string | null;
+    errorDocument: string | null;
+  };
   keys: Key[];
   objects: number;
   bytes: number;
@@ -36,12 +58,8 @@ export type Permissions = {
   owner: boolean;
 };
 
-export type WebsiteConfig = {
-  indexDocument: string;
-  errorDocument: string;
-};
 
 export type Quotas = {
-  maxSize: null;
-  maxObjects: null;
+  maxSize: number | null;
+  maxObjects: number | null;
 };

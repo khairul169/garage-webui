@@ -16,12 +16,27 @@ export const assignNodeSchema = z
     capacityUnit: z.enum(capacityUnits),
     isGateway: z.boolean(),
     tags: z.string().min(1).array(),
+    zoneRedundancyType: z.enum(["atLeast", "maximum"]),
+    zoneRedundancyAtLeast: z.coerce.number(),
   })
   .refine(
     (values) => values.isGateway || (values.capacity && values.capacity > 0),
     {
       message: "Capacity required",
       path: ["capacity"],
+    }
+  )
+  .refine(
+    (data) => {
+      if (data.zoneRedundancyType === "atLeast" && !data.zoneRedundancyAtLeast) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message:
+        'Zone Redundancy At Least is required when Zone Redundancy Type is "atLeast"',
+      path: ["zoneRedundancyAtLeast"],
     }
   );
 

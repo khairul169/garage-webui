@@ -13,16 +13,19 @@ import {
   PieChart,
 } from "lucide-react";
 import { cn, readableBytes, ucfirst } from "@/lib/utils";
-import { useBuckets } from "../buckets/hooks";
+import { useBucketsWithDetails } from "../buckets/hooks";
 import { useMemo } from "react";
 
 const HomePage = () => {
   const { data: health } = useNodesHealth();
-  const { data: buckets } = useBuckets();
+  const bucketDetailsQueries = useBucketsWithDetails();
 
   const totalUsage = useMemo(() => {
-    return buckets?.reduce((acc, bucket) => acc + bucket.bytes, 0);
-  }, [buckets]);
+    return bucketDetailsQueries
+      .map(query => query.data?.bytes)
+      .filter(bytes => bytes != null)
+      .reduce((acc, bytes) => acc + bytes, 0);
+  }, [bucketDetailsQueries]);
 
   return (
     <div className="container">

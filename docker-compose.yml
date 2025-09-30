@@ -14,7 +14,7 @@ services:
       - 3903:3903
 
   webui:
-    image: khairul169/garage-webui:latest
+    image: ghcr.io/khairul169/garage-webui:latest
     container_name: garage-webui
     restart: unless-stopped
     volumes:

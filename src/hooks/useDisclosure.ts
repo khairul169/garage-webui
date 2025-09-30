@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-export const useDisclosure = <T = any>() => {
+export const useDisclosure = <T = unknown>() => {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [data, setData] = useState<T | null | undefined>(null);

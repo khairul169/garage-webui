@@ -60,7 +60,7 @@ const AddAliasDialog = ({ id }: { id?: string }) => {
 
   useEffect(() => {
     if (isOpen) form.setFocus("alias");
-  }, [isOpen]);
+  }, [isOpen, form]);
 
   const addAlias = useAddAlias(id, {
     onSuccess: () => {

@@ -1,20 +1,20 @@
 import { useCallback, useRef } from "react";
 
-export const useDebounce = <T extends (...args: any[]) => void>(
-  fn: T,
+export const useDebounce = <Args extends unknown[]>(
+  fn: (...args: Args) => void,
   delay: number = 500
 ) => {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const debouncedFn = useCallback(
-    (...args: any[]) => {
+    (...args: Args) => {
       if (timerRef.current) {
         clearTimeout(timerRef.current);
       }
       timerRef.current = setTimeout(() => fn(...args), delay);
     },
-    [fn]
+    [fn, delay]
   );
 
-  return debouncedFn as T;
+  return debouncedFn;
 };

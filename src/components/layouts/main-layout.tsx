@@ -1,5 +1,5 @@
 import { PageContext } from "@/context/page-context";
-import { Suspense, useContext, useEffect } from "react";
+import { Suspense, useContext, useEffect, useRef } from "react";
 import { Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
 import Sidebar from "../containers/sidebar";
 import { ArrowLeft, MenuIcon } from "lucide-react";
@@ -13,9 +13,12 @@ const MainLayout = () => {
   const { pathname } = useLocation();
   const auth = useAuth();
 
+  const sidebarRef = useRef(sidebar);
+  sidebarRef.current = sidebar;
+
   useEffect(() => {
-    if (sidebar.isOpen) {
-      sidebar.onClose();
+    if (sidebarRef.current.isOpen) {
+      sidebarRef.current.onClose();
     }
   }, [pathname]);
 

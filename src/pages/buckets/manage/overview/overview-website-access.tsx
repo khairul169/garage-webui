@@ -16,6 +16,11 @@ const WebsiteAccessSection = () => {
   const { data: config } = useConfig();
   const form = useForm<WebsiteConfigSchema>({
     resolver: zodResolver(websiteConfigSchema),
+    defaultValues: {
+      websiteAccess: false,
+      indexDocument: "index.html",
+      errorDocument: "error/400.html",
+    },
   });
   const isEnabled = useWatch({ control: form.control, name: "websiteAccess" });
 
@@ -24,34 +29,46 @@ const WebsiteAccessSection = () => {
 
   const updateMutation = useUpdateBucket(data?.id);
 
-  const onChange = useDebounce((values: DeepPartial<WebsiteConfigSchema>) => {
-    const data = {
+  const handleChange = useDebounce((values: DeepPartial<WebsiteConfigSchema>) => {
+    const websiteData = {
       enabled: values.websiteAccess,
       indexDocument: values.websiteAccess
-        ? values.websiteConfig?.indexDocument
+        ? values.indexDocument
         : undefined,
       errorDocument: values.websiteAccess
-        ? values.websiteConfig?.errorDocument
+        ? values.errorDocument
         : undefined,
     };
 
     updateMutation.mutate({
-      websiteAccess: data,
+      websiteAccess: {
+        enabled: values.websiteAccess ?? false,
+        indexDocument: values.websiteAccess
+          ? websiteData.indexDocument ?? "index.html"
+          : null,
+        errorDocument: values.websiteAccess
+          ? websiteData.errorDocument ?? "error/400.html"
+          : null,
+      }
     });
   });
 
+  // Reset form when data changes without triggering watch
   useEffect(() => {
-    form.reset({
-      websiteAccess: data?.websiteAccess,
-      websiteConfig: {
-        indexDocument: data?.websiteConfig?.indexDocument || "index.html",
-        errorDocument: data?.websiteConfig?.errorDocument || "error/400.html",
-      },
-    });
+    if (!data) return;
 
-    const { unsubscribe } = form.watch((values) => onChange(values));
-    return unsubscribe;
-  }, [data]);
+    form.reset({
+      websiteAccess: data?.websiteAccess ?? false,
+      indexDocument: data?.websiteConfig?.indexDocument || "index.html",
+      errorDocument: data?.websiteConfig?.errorDocument || "error/400.html",
+    }, { keepDirty: false });
+  }, [data, form]);
+
+  // Set up form watcher
+  useEffect(() => {
+    const subscription = form.watch(handleChange);
+    return () => subscription.unsubscribe();
+  }, [form, handleChange]);
 
   return (
     <div className="mt-8">
@@ -75,12 +92,12 @@ const WebsiteAccessSection = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <InputField
               form={form}
-              name="websiteConfig.indexDocument"
+              name="indexDocument"
               title="Index Document"
             />
             <InputField
               form={form}
-              name="websiteConfig.errorDocument"
+              name="errorDocument"
               title="Error Document"
             />
           </div>

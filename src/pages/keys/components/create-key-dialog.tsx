@@ -17,14 +17,19 @@ const CreateKeyDialog = () => {
   const { dialogRef, isOpen, onOpen, onClose } = useDisclosure();
   const form = useForm<CreateKeySchema>({
     resolver: zodResolver(createKeySchema),
-    defaultValues: { name: "" },
+    defaultValues: {
+      name: "",
+      isImport: false,
+      accessKeyId: "",
+      secretAccessKey: ""
+    },
   });
   const isImport = useWatch({ control: form.control, name: "isImport" });
   const queryClient = useQueryClient();
 
   useEffect(() => {
     if (isOpen) form.setFocus("name");
-  }, [isOpen]);
+  }, [isOpen, form]);
 
   const createKey = useCreateKey({
     onSuccess: () => {

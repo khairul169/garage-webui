@@ -22,7 +22,7 @@ const CreateBucketDialog = () => {
 
   useEffect(() => {
     if (isOpen) form.setFocus("globalAlias");
-  }, [isOpen]);
+  }, [isOpen, form]);
 
   const createBucket = useCreateBucket({
     onSuccess: () => {

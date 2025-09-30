@@ -8,7 +8,7 @@ type Props = ComponentPropsWithoutRef<typeof BaseSelect> & {
   onCreateOption?: (inputValue: string) => void;
 };
 
-const Select = forwardRef<any, Props>(({ creatable, ...props }, ref) => {
+const Select = forwardRef<React.ComponentRef<typeof BaseSelect>, Props>(({ creatable, ...props }, ref) => {
   const Comp = creatable ? Creatable : BaseSelect;
 
   return (

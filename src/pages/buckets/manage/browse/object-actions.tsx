@@ -8,7 +8,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { handleError } from "@/lib/utils";
 import { API_URL } from "@/lib/api";
-import { shareDialog } from "./share-dialog";
+import { shareDialog } from "./share-dialog-store";
 
 type Props = {
   prefix?: string;
@@ -36,8 +36,7 @@ const ObjectActions = ({ prefix = "", object, end }: Props) => {
   const onDelete = () => {
     if (
       window.confirm(
-        `Are you sure you want to delete this ${
-          isDirectory ? "directory and its content" : "object"
+        `Are you sure you want to delete this ${isDirectory ? "directory and its content" : "object"
         }?`
       )
     ) {

@@ -6,9 +6,9 @@ export const createKeySchema = z
       .string()
       .min(1, "Key Name is required")
       .regex(/^[a-zA-Z0-9_-]+$/, "Key Name invalid"),
-    isImport: z.boolean().nullish(),
-    accessKeyId: z.string().nullish(),
-    secretAccessKey: z.string().nullish(),
+    isImport: z.boolean().default(false),
+    accessKeyId: z.string().optional(),
+    secretAccessKey: z.string().optional(),
   })
   .refine(
     (v) => !v.isImport || (v.accessKeyId != null && v.accessKeyId.length > 0),

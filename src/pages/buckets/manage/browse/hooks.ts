@@ -23,7 +23,7 @@ export const useBrowseObjects = (
 
 export const usePutObject = (
   bucket: string,
-  options?: UseMutationOptions<any, Error, PutObjectPayload>
+  options?: UseMutationOptions<unknown, Error, PutObjectPayload>
 ) => {
   return useMutation({
     mutationFn: async (body) => {
@@ -40,7 +40,7 @@ export const usePutObject = (
 
 export const useDeleteObject = (
   bucket: string,
-  options?: UseMutationOptions<any, Error, { key: string; recursive?: boolean }>
+  options?: UseMutationOptions<unknown, Error, { key: string; recursive?: boolean }>
 ) => {
   return useMutation({
     mutationFn: (data) =>

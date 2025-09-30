@@ -1,0 +1,57 @@
+services:
+  garage:
+    image: dxflrs/garage:v2.0.0
+    container_name: garage
+    hostname: garage
+    volumes:
+      - ./dev.local/garage.toml:/etc/garage.toml
+      - ./dev.local/data-garage/meta:/var/lib/garage/meta
+      - ./dev.local/data-garage/data:/var/lib/garage/data
+    restart: unless-stopped
+    ports:
+      - 3900:3900
+      - 3901:3901
+      - 3902:3902
+      - 3903:3903
+  garage2:
+    image: dxflrs/garage:v2.0.0
+    container_name: garage2
+    hostname: garage2
+    volumes:
+      - ./dev.local/garage2.toml:/etc/garage.toml
+      - ./dev.local/data-garage2/meta:/var/lib/garage/meta
+      - ./dev.local/data-garage2/data:/var/lib/garage/data
+    restart: unless-stopped
+    ports:
+      - 3900
+      - 3901
+      - 3902
+      - 3903
+  garage3:
+    image: dxflrs/garage:v2.0.0
+    container_name: garage3
+    hostname: garage3
+    volumes:
+      - ./dev.local/garage3.toml:/etc/garage.toml
+      - ./dev.local/data-garage3/meta:/var/lib/garage/meta
+      - ./dev.local/data-garage3/data:/var/lib/garage/data
+    restart: unless-stopped
+    ports:
+      - 3900
+      - 3901
+      - 3902
+      - 3903
+  garage4:
+    image: dxflrs/garage:v2.0.0
+    container_name: garage4
+    hostname: garage4
+    volumes:
+      - ./dev.local/garage4.toml:/etc/garage.toml
+      - ./dev.local/data-garage4/meta:/var/lib/garage/meta
+      - ./dev.local/data-garage4/data:/var/lib/garage/data
+    restart: unless-stopped
+    ports:
+      - 3900
+      - 3901
+      - 3902
+      - 3903

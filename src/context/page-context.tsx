@@ -5,6 +5,8 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
+  useRef,
   useState,
 } from "react";
 
@@ -16,8 +18,8 @@ type PageContextValues = {
 
 export const PageContext = createContext<
   | (PageContextValues & {
-      setValue: (values: Partial<PageContextValues>) => void;
-    })
+    setValue: (values: Partial<PageContextValues>) => void;
+  })
   | null
 >(null);
 
@@ -34,8 +36,13 @@ export const PageContextProvider = ({ children }: PropsWithChildren) => {
     setValues((prev) => ({ ...prev, ...value }));
   }, []);
 
+  const contextValue = useMemo(() => ({
+    ...values,
+    setValue
+  }), [values, setValue]);
+
   return (
-    <PageContext.Provider children={children} value={{ ...values, setValue }} />
+    <PageContext.Provider children={children} value={contextValue} />
   );
 };
 
@@ -47,13 +54,18 @@ const Page = memo((props: PageProps) => {
     throw new Error("Page component must be used within a PageContextProvider");
   }
 
-  useEffect(() => {
-    context.setValue(props);
+  const setValueRef = useRef(context.setValue);
+  setValueRef.current = context.setValue;
 
+  useEffect(() => {
+    setValueRef.current(props);
+  }, [props]);
+
+  useEffect(() => {
     return () => {
-      context.setValue(initialValues);
+      setValueRef.current(initialValues);
     };
-  }, [props, context.setValue]);
+  }, []);
 
   return null;
 });

@@ -46,7 +46,7 @@ export type DataPartition = {
 export type Role = {
   id: string;
   zone: string;
-  capacity: number;
+  capacity: number | null;
   tags: string[];
 };
 
@@ -60,11 +60,22 @@ export type GetClusterLayoutResult = {
   stagedRoleChanges: StagedRole[];
 };
 
-export type AssignNodeBody = {
+export type PartitionNumber = {
+  atLeast: number;
+};
+
+export type LayoutParameters = {
+  zoneRedundancy: "maximum" | PartitionNumber;
+}
+
+export type NodeRoleChange = {
+  remove: boolean;
   id: string;
-  zone: string;
-  capacity: number | null;
-  tags: string[];
+}
+
+export type AssignNodeBody = {
+  parameters: null | LayoutParameters,
+  roles: Role[] | NodeRoleChange[];
 };
 
 export type ApplyLayoutResult = {

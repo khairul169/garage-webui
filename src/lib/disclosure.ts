@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { createStore, useStore } from "zustand";
 
-export const createDisclosure = <T = any>() => {
+export const createDisclosure = <T = unknown>() => {
   const store = createStore(() => ({
     data: undefined as T | null,
     isOpen: false,

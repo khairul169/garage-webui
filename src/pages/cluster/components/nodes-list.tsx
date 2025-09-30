@@ -219,7 +219,7 @@ const NodesList = ({ nodes }: NodeListProps) => {
                 <>
                   <p>{item.role?.zone || "-"}</p>
                   <div className="flex flex-row items-center flex-wrap gap-1">
-                    {item.role?.tags?.map((tag: any) => (
+                    {item.role?.tags?.map((tag: string) => (
                       <Badge key={tag} color="primary">
                         {tag}
                       </Badge>

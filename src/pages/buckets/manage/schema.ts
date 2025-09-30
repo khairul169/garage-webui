@@ -8,9 +8,8 @@ export type AddAliasSchema = z.infer<typeof addAliasSchema>;
 
 export const websiteConfigSchema = z.object({
   websiteAccess: z.boolean(),
-  websiteConfig: z
-    .object({ indexDocument: z.string(), errorDocument: z.string() })
-    .nullish(),
+  indexDocument: z.string().nullish(),
+  errorDocument: z.string().nullish(),
 });
 
 export type WebsiteConfigSchema = z.infer<typeof websiteConfigSchema>;

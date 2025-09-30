@@ -5,7 +5,7 @@ import {
   UseMutationOptions,
   useQuery,
 } from "@tanstack/react-query";
-import { Bucket, Permissions } from "../types";
+import { Bucket, Permissions, UpdateBucket } from "../types";
 
 export const useBucket = (id?: string | null) => {
   return useQuery({
@@ -17,8 +17,8 @@ export const useBucket = (id?: string | null) => {
 
 export const useUpdateBucket = (id?: string | null) => {
   return useMutation({
-    mutationFn: (values: any) => {
-      return api.post<any>("/v2/UpdateBucket", {
+mutationFn: (values: Partial<UpdateBucket>) => {
+      return api.post<Bucket>("/v2/UpdateBucket", {
         params: { id },
         body: values,
       });
@@ -28,7 +28,7 @@ export const useUpdateBucket = (id?: string | null) => {
 
 export const useAddAlias = (
   bucketId?: string | null,
-  options?: UseMutationOptions<any, Error, string>
+  options?: UseMutationOptions<unknown, Error, string>
 ) => {
   return useMutation({
     mutationFn: (alias: string) => {
@@ -42,7 +42,7 @@ export const useAddAlias = (
 
 export const useRemoveAlias = (
   bucketId?: string | null,
-  options?: UseMutationOptions<any, Error, string>
+  options?: UseMutationOptions<unknown, Error, string>
 ) => {
   return useMutation({
     mutationFn: (alias: string) => {
@@ -57,7 +57,7 @@ export const useRemoveAlias = (
 export const useAllowKey = (
   bucketId?: string | null,
   options?: MutationOptions<
-    any,
+    unknown,
     Error,
     { keyId: string; permissions: Permissions }[]
   >
@@ -83,7 +83,7 @@ export const useAllowKey = (
 export const useDenyKey = (
   bucketId?: string | null,
   options?: MutationOptions<
-    any,
+    unknown,
     Error,
     { keyId: string; permissions: Permissions }
   >
@@ -103,7 +103,7 @@ export const useDenyKey = (
 };
 
 export const useRemoveBucket = (
-  options?: MutationOptions<any, Error, string>
+  options?: MutationOptions<unknown, Error, string>
 ) => {
   return useMutation({
     mutationFn: (id) => api.post("/v2/DeleteBucket", { params: { id } }),

@@ -15,7 +15,7 @@ export const useKeys = () => {
 };
 
 export const useCreateKey = (
-  options?: UseMutationOptions<any, Error, CreateKeySchema>
+  options?: UseMutationOptions<unknown, Error, CreateKeySchema>
 ) => {
   return useMutation({
     mutationFn: async (body) => {
@@ -29,7 +29,7 @@ export const useCreateKey = (
 };
 
 export const useRemoveKey = (
-  options?: UseMutationOptions<any, Error, string>
+  options?: UseMutationOptions<unknown, Error, string>
 ) => {
   return useMutation({
     mutationFn: (id) => api.post("/v2/DeleteKey", { params: { id } }),
