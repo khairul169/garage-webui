@@ -170,6 +170,8 @@ webui:
     AUTH_USER_PASS: "username:$2y$10$DSTi9o..."
 ```
 
+**Attention:** If login fails, you may need to escape the dollar character (`$`). For example: `$2y$10$DSTi9o...` → `$$2y$$10$$DSTi9o`
+
 ### Running
 
 Once your instance of Garage Web UI is started, you can open the web UI at http://your-ip:3909. You can place it behind a reverse proxy to secure it with SSL.
