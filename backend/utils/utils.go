@@ -18,6 +18,13 @@ func LastString(str []string) string {
 	return str[len(str)-1]
 }
 
+func NilIfEmpty[T any](s []T) []T {
+    if len(s) == 0 {
+        return nil
+    }
+    return s
+}
+
 func ResponseError(w http.ResponseWriter, err error) {
 	w.WriteHeader(http.StatusInternalServerError)
 	w.Write([]byte(err.Error()))

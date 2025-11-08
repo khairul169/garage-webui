@@ -18,6 +18,14 @@ export type Bucket = {
   quotas: Quotas;
 };
 
+export type BucketCors = {
+  allowedMethods: string[] | null;
+  allowedOrigins: string[] | null;
+  allowedHeaders: string[] | null;
+  exposeHeaders: string[] | null;
+  maxAgeSeconds: number | null;
+};
+
 export type LocalAlias = {
   accessKeyId: string;
   alias: string;

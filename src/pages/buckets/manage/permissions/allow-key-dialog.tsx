@@ -19,7 +19,7 @@ type Props = {
 };
 
 const AllowKeyDialog = ({ currentKeys }: Props) => {
-  const { bucket } = useBucketContext();
+  const { bucket, bucketName } = useBucketContext();
   const { dialogRef, isOpen, onOpen, onClose } = useDisclosure();
   const { data: keys } = useKeys();
   const form = useForm<AllowKeysSchema>({
@@ -37,6 +37,7 @@ const AllowKeyDialog = ({ currentKeys }: Props) => {
       onClose();
       toast.success("Key allowed!");
       queryClient.invalidateQueries({ queryKey: ["bucket", bucket.id] });
+      queryClient.invalidateQueries({ queryKey: ["bucket_cors", bucketName] });
     },
     onError: handleError,
   });

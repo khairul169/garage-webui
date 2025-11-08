@@ -24,6 +24,14 @@ type Bucket struct {
 	Created                        string        `json:"created"`
 }
 
+type BucketCors struct {
+	AllowedOrigins []string `json:"allowedOrigins"`
+	AllowedMethods []string `json:"allowedMethods"`
+	AllowedHeaders []string `json:"allowedHeaders"`
+	ExposeHeaders  []string `json:"exposeHeaders"`
+	MaxAgeSeconds  *int32    `json:"maxAgeSeconds"`
+}
+
 type LocalAlias struct {
 	AccessKeyID string `json:"accessKeyId"`
 	Alias       string `json:"alias"`
@@ -51,4 +59,17 @@ type Quotas struct {
 type WebsiteConfig struct {
 	IndexDocument string `json:"indexDocument"`
 	ErrorDocument string `json:"errorDocument"`
+}
+
+func (p *Permissions) HasPermission(perm string) bool {
+	switch perm {
+	case "read":
+		return p.Read
+	case "write":
+		return p.Write
+	case "owner":
+		return p.Owner
+	default:
+		return false
+	}
 }

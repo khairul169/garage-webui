@@ -1,8 +1,9 @@
 import { createContext, useContext } from "react";
-import { Bucket } from "../types";
+import { Bucket, BucketCors } from "../types";
 
 export const BucketContext = createContext<{
   bucket: Bucket;
+  cors: BucketCors[];
   refetch: () => void;
   bucketName: string;
 } | null>(null);

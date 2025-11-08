@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { useBucket } from "./hooks";
+import { useBucket, useBucketCors } from "./hooks";
 import Page from "@/context/page-context";
 import TabView, { Tab } from "@/components/containers/tab-view";
 import {
@@ -39,6 +39,9 @@ const tabs: Tab[] = [
 const ManageBucketPage = () => {
   const { id } = useParams();
   const { data, error, isLoading, refetch } = useBucket(id);
+  const { data: cors, isLoading: corsLoading } = useBucketCors(
+    data?.globalAliases[0]
+  );
 
   const name = data?.globalAliases[0];
 
@@ -62,10 +65,15 @@ const ManageBucketPage = () => {
         </Alert>
       )}
 
-      {data && (
+      {data && !corsLoading && (
         <div className="container">
           <BucketContext.Provider
-            value={{ bucket: data, refetch, bucketName: name || "" }}
+            value={{
+              bucket: data,
+              cors: cors ?? [],
+              refetch,
+              bucketName: name || "",
+            }}
           >
             <TabView tabs={tabs} className="bg-base-100 h-14 px-1.5" />
           </BucketContext.Provider>

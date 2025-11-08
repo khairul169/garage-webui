@@ -5,7 +5,8 @@ import {
   UseMutationOptions,
   useQuery,
 } from "@tanstack/react-query";
-import { Bucket, Permissions } from "../types";
+import { Bucket, BucketCors, Permissions } from "../types";
+import { BucketCorsSchema } from "./schema";
 
 export const useBucket = (id?: string | null) => {
   return useQuery({
@@ -107,6 +108,27 @@ export const useRemoveBucket = (
 ) => {
   return useMutation({
     mutationFn: (id) => api.post("/v2/DeleteBucket", { params: { id } }),
+    ...options,
+  });
+};
+
+export const useBucketCors = (bucketName?: string) => {
+  return useQuery({
+    queryKey: ["bucket_cors", bucketName],
+    queryFn: () => api.get<BucketCors[]>(`/buckets/${bucketName}/cors`),
+    enabled: !!bucketName,
+    retry: false,
+  });
+};
+
+export const useBucketCorsMutation = (
+  options?: MutationOptions<any, Error, BucketCorsSchema>
+) => {
+  return useMutation({
+    mutationFn: (data: BucketCorsSchema) =>
+      api.put(`/buckets/${data.bucketName}/cors`, {
+        body: { rules: data.rules },
+      }),
     ...options,
   });
 };
