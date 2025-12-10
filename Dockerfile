@@ -26,7 +26,7 @@ COPY --from=ghcr.io/tarampampam/microcheck:1 /bin/httpcheck /bin/httpcheck
 COPY --from=backend /app/main /bin/main
 
 HEALTHCHECK --interval=5m --timeout=2s --retries=3 --start-period=15s CMD [ \
-    "/bin/httpcheck", "--fail", "http://127.0.0.1:3909" \
+    "/bin/httpcheck", "http://127.0.0.1:3909" \
 ]
 
 ENTRYPOINT [ "main" ]
