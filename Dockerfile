@@ -22,11 +22,11 @@ RUN make
 FROM scratch
 
 COPY --from=alpine /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=ghcr.io/tarampampam/curl:8.6.0 /bin/curl /bin/curl
+COPY --from=ghcr.io/tarampampam/microcheck:1 /bin/httpcheck /bin/httpcheck
 COPY --from=backend /app/main /bin/main
 
 HEALTHCHECK --interval=5m --timeout=2s --retries=3 --start-period=15s CMD [ \
-    "curl", "--fail", "http://127.0.0.1:3909" \
+    "/bin/httpcheck", "http://127.0.0.1:3909" \
 ]
 
 ENTRYPOINT [ "main" ]
