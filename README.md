@@ -16,7 +16,7 @@ A simple admin web UI for [Garage](https://garagehq.deuxfleurs.fr/), a self-host
 
 ## Installation
 
-The Garage Web UI is available as a single executable binary and docker image. You can install it using the command line or with Docker Compose.
+The Garage Web UI is available as a single executable binary and docker image. You can install it using the command line, Docker Compose, or Kubernetes.
 
 ### Docker CLI
 
@@ -56,6 +56,26 @@ services:
       API_BASE_URL: "http://garage:3903"
       S3_ENDPOINT_URL: "http://garage:3900"
 ```
+
+### Kubernetes (Helm)
+
+You can deploy the Web UI to a Kubernetes cluster using the provided Helm chart found in `deploy/helm`.
+
+1.  **Clone the repository:**
+
+    ```sh
+    $ git clone [https://github.com/khairul169/garage-webui.git](https://github.com/khairul169/garage-webui.git)
+    $ cd garage-webui
+    ```
+
+2.  **Customize configuration:**
+    Edit `deploy/helm/values.yaml` to match your environment. You will likely need to update `API_BASE_URL` and `S3_ENDPOINT_URL` to point to your internal Garage services.
+
+3.  **Install the chart:**
+
+    ```sh
+    $ helm install garage-webui ./deploy/helm --namespace garage --create-namespace
+    ```
 
 ### Without Docker
 

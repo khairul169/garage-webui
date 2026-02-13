@@ -1,0 +1,168 @@
+# Default values for Garage Web UI.
+# This is a YAML-formatted file.
+
+# This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
+replicaCount: 1
+
+# This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
+image:
+  repository: khairul169/garage-webui
+  pullPolicy: IfNotPresent
+  tag: "1.1.0"
+
+# This is for the secrets for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+imagePullSecrets: []
+# This is to override the chart name.
+nameOverride: ""
+fullnameOverride: "garage-webui"
+
+# This section builds out the service account more information can be found here: https://kubernetes.io/docs/concepts/security/service-accounts/
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Automatically mount a ServiceAccount's API credentials?
+  automount: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+# This is for setting Kubernetes Annotations to a Pod.
+# For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+podAnnotations: {}
+# This is for setting Kubernetes Labels to a Pod.
+# For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+podLabels: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+# This is for setting up a service more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/
+service:
+  # This sets the service type more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
+  type: ClusterIP
+  # This sets the ports more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
+  name: garage-webui
+  port: 80
+  targetPort: 3909
+
+httproute:
+  enabled: false
+  annotations: {}
+  parentRefs: []
+  hostnames: []
+
+# This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+# This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+livenessProbe:
+  httpGet:
+    path: /
+    port: http
+  initialDelaySeconds: 10
+  periodSeconds: 30
+
+readinessProbe:
+  httpGet:
+    path: /
+    port: http
+  initialDelaySeconds: 5
+  periodSeconds: 10
+
+# This section is for setting up autoscaling more information can be found here: https://kubernetes.io/docs/concepts/workloads/autoscaling/
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+# Additional volumes on the pod (merged with built-in config volume when config.enabled).
+# Each volume here must have a matching mount in volumeMounts.
+volumes: []
+# - name: certs
+#   secret:
+#     secretName: my-tls-secret
+#     optional: false
+# - name: extra-config
+#   configMap:
+#     name: my-config
+
+# Additional volumeMounts for the main container (merged with config mount when config.enabled).
+# Names must match entries in volumes.
+volumeMounts: []
+# - name: certs
+#   mountPath: /etc/certs
+#   readOnly: true
+# - name: extra-config
+#   mountPath: /etc/extra
+#   readOnly: true
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+garageConfig:
+  s3Endpoint: "http://garage:3900"
+  region: "garage"
+  adminApiUrl: "http://garage-admin:3903"
+  adminApiKey: ""
+
+auth:
+  # Generate this using: htpasswd -nbBC 10 "admin" "yourpassword"
+  userPassHash: ""
+
+# API credentials (admin API key, auth hash) from an existing Secret.
+# When enabled, env vars are set via secretKeyRef; otherwise values from garageConfig.adminApiKey and auth.userPassHash are used.
+secretRefs:
+  enabled: false
+  # Name of the existing Secret (required when enabled)
+  name: ""
+  # Map of environment variable names to Secret data keys
+  keys:
+    API_ADMIN_KEY: ""   # e.g. "admin-api-key"
+    AUTH_USER_PASS: ""  # e.g. "user-pass-hash"
+
+config:
+  # -- Enable mounting of the config file
+  enabled: false
+  # -- Name of the ConfigMap to mount
+  name: "garage-webui-config"

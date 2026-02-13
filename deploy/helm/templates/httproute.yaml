@@ -1,0 +1,47 @@
+{{- if .Values.httproute.enabled -}}
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: {{ include "garage-webui.fullname" . }}
+  labels:
+    {{- include "garage-webui.labels" . | nindent 4 }}
+  {{- with .Values.httproute.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  parentRefs:
+  {{- range .Values.httproute.parentRefs }}
+    - name: {{ .name }}
+      namespace: {{ .namespace | default $.Release.Namespace }}
+      {{- if .sectionName }}
+      sectionName: {{ .sectionName }}
+      {{- end }}
+  {{- end }}
+  {{- if .Values.httproute.hostnames }}
+  hostnames:
+    {{- toYaml .Values.httproute.hostnames | nindent 4 }}
+  {{- end }}
+  rules:
+  {{- if .Values.httproute.rules }}
+  {{- range .Values.httproute.rules }}
+    - matches:
+      {{- toYaml .matches | nindent 6 }}
+      backendRefs:
+      {{- if .backendRefs }}
+        {{- toYaml .backendRefs | nindent 8 }}
+      {{- else }}
+        - name: {{ include "garage-webui.fullname" $ }}
+          port: {{ $.Values.service.port }}
+      {{- end }}
+  {{- end }}
+  {{- else }}
+    - matches:
+      - path:
+          type: PathPrefix
+          value: /
+      backendRefs:
+        - name: {{ include "garage-webui.fullname" . }}
+          port: {{ .Values.service.port }}
+  {{- end }}
+{{- end }}
