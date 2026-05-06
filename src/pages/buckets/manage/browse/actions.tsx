@@ -18,13 +18,13 @@ type Props = {
 };
 
 const Actions = ({ prefix }: Props) => {
-  const { bucketName } = useBucketContext();
+  const { bucket } = useBucketContext();
   const queryClient = useQueryClient();
 
-  const putObject = usePutObject(bucketName, {
+  const putObject = usePutObject(bucket, {
     onSuccess: () => {
       toast.success("File uploaded!");
-      queryClient.invalidateQueries({ queryKey: ["browse", bucketName] });
+      queryClient.invalidateQueries({ queryKey: ["browse", bucket.id] });
     },
     onError: handleError,
   });
@@ -76,7 +76,7 @@ type CreateFolderActionProps = {
 
 const CreateFolderAction = ({ prefix }: CreateFolderActionProps) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { bucketName } = useBucketContext();
+  const { bucket } = useBucketContext();
   const queryClient = useQueryClient();
 
   const form = useForm<CreateFolderSchema>({
@@ -88,10 +88,10 @@ const CreateFolderAction = ({ prefix }: CreateFolderActionProps) => {
     if (isOpen) form.setFocus("name");
   }, [isOpen]);
 
-  const createFolder = usePutObject(bucketName, {
+  const createFolder = usePutObject(bucket, {
     onSuccess: () => {
       toast.success("Folder created!");
-      queryClient.invalidateQueries({ queryKey: ["browse", bucketName] });
+      queryClient.invalidateQueries({ queryKey: ["browse", bucket.id] });
       onClose();
       form.reset();
     },

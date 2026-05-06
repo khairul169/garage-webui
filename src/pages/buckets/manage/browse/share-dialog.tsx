@@ -18,7 +18,7 @@ const ShareDialog = () => {
   const [domain, setDomain] = useState(bucketName);
 
   const websitePort = config?.s3_web?.bind_addr?.split(":").pop() || "80";
-  const rootDomain = config?.s3_web?.root_domain;
+  const rootDomain = config?.s3_web?.root_domain || "";
 
   const domains = useMemo(
     () => [
