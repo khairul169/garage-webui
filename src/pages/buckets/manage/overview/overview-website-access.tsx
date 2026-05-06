@@ -70,7 +70,7 @@ const WebsiteAccessSection = () => {
 
       <ToggleField form={form} name="websiteAccess" label="Enabled" />
 
-      {isEnabled && (
+      {isEnabled && bucketName && (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <InputField
