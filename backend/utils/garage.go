@@ -92,7 +92,7 @@ func (g *garage) GetAdminKey() string {
 		if err != nil {
 			log.Fatal(err)
 		}
-		return key
+		return string(key)
 	}
 	
 	key := os.Getenv("API_ADMIN_KEY")
