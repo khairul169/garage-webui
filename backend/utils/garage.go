@@ -86,6 +86,15 @@ func (g *garage) GetS3Region() string {
 }
 
 func (g *garage) GetAdminKey() string {
+	keyPath := os.Getenv("API_ADMIN_KEY_FILE")
+	if len(keyPath) > 0 {
+		key, err := os.ReadFile(keyPath)
+		if err != nil {
+			log.Fatal(err)
+		}
+		return string(key)
+	}
+	
 	key := os.Getenv("API_ADMIN_KEY")
 	if len(key) > 0 {
 		return key

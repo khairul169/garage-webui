@@ -146,6 +146,7 @@ Configurable envs:
 - `BASE_PATH`: Base path or prefix for Web UI.
 - `API_BASE_URL`: Garage admin API endpoint URL.
 - `API_ADMIN_KEY`: Admin API key.
+- `API_ADMIN_KEY_FILE`: File to read the Admin API key from (overrides `API_ADMIN_KEY`)
 - `S3_REGION`: S3 Region.
 - `S3_ENDPOINT_URL`: S3 Endpoint url.
 
