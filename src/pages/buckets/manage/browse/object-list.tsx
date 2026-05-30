@@ -21,8 +21,8 @@ type Props = {
 };
 
 const ObjectList = ({ prefix, onPrefixChange }: Props) => {
-  const { bucketName } = useBucketContext();
-  const { data, error, isLoading } = useBrowseObjects(bucketName, {
+  const { bucket } = useBucketContext();
+  const { data, error, isLoading } = useBrowseObjects(bucket.id, {
     prefix,
     limit: 1000,
   });
