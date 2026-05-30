@@ -24,7 +24,7 @@ type Browse struct{}
 
 func (b *Browse) GetObjects(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
-	bucket := r.PathValue("bucket")
+	bucketId := r.PathValue("bucket")
 	prefix := query.Get("prefix")
 	continuationToken := query.Get("next")
 
@@ -33,7 +33,7 @@ func (b *Browse) GetObjects(w http.ResponseWriter, r *http.Request) {
 		limit = 100
 	}
 
-	client, err := getS3Client(bucket)
+	client, bucket, err := getS3Client(bucketId)
 	if err != nil {
 		utils.ResponseError(w, err)
 		return
@@ -73,7 +73,7 @@ func (b *Browse) GetObjects(w http.ResponseWriter, r *http.Request) {
 			ObjectKey:    &key,
 			LastModified: object.LastModified,
 			Size:         object.Size,
-			Url:          fmt.Sprintf("/browse/%s/%s", bucket, *object.Key),
+			Url:          fmt.Sprintf("/browse/%s/%s", bucketId, *object.Key),
 		})
 	}
 
@@ -81,14 +81,14 @@ func (b *Browse) GetObjects(w http.ResponseWriter, r *http.Request) {
 }
 
 func (b *Browse) GetOneObject(w http.ResponseWriter, r *http.Request) {
-	bucket := r.PathValue("bucket")
+	bucketId := r.PathValue("bucket")
 	key := r.PathValue("key")
 	queryParams := r.URL.Query()
 	view := queryParams.Get("view") == "1"
 	thumbnail := queryParams.Get("thumb") == "1"
 	download := queryParams.Get("dl") == "1"
 
-	client, err := getS3Client(bucket)
+	client, bucket, err := getS3Client(bucketId)
 	if err != nil {
 		utils.ResponseError(w, err)
 		return
@@ -170,7 +170,7 @@ func (b *Browse) GetOneObject(w http.ResponseWriter, r *http.Request) {
 }
 
 func (b *Browse) PutObject(w http.ResponseWriter, r *http.Request) {
-	bucket := r.PathValue("bucket")
+	bucketId := r.PathValue("bucket")
 	key := r.PathValue("key")
 	isDirectory := strings.HasSuffix(key, "/")
 
@@ -184,7 +184,7 @@ func (b *Browse) PutObject(w http.ResponseWriter, r *http.Request) {
 		defer file.Close()
 	}
 
-	client, err := getS3Client(bucket)
+	client, bucket, err := getS3Client(bucketId)
 	if err != nil {
 		utils.ResponseError(w, err)
 		return
@@ -215,12 +215,12 @@ func (b *Browse) PutObject(w http.ResponseWriter, r *http.Request) {
 }
 
 func (b *Browse) DeleteObject(w http.ResponseWriter, r *http.Request) {
-	bucket := r.PathValue("bucket")
+	bucketId := r.PathValue("bucket")
 	key := r.PathValue("key")
 	recursive := r.URL.Query().Get("recursive") == "true"
 	isDirectory := strings.HasSuffix(key, "/")
 
-	client, err := getS3Client(bucket)
+	client, bucket, err := getS3Client(bucketId)
 	if err != nil {
 		utils.ResponseError(w, err)
 		return
@@ -284,15 +284,23 @@ func (b *Browse) DeleteObject(w http.ResponseWriter, r *http.Request) {
 	utils.ResponseSuccess(w, res)
 }
 
-func getBucketCredentials(bucket string) (aws.CredentialsProvider, error) {
-	cacheKey := fmt.Sprintf("key:%s", bucket)
-	cacheData := utils.Cache.Get(cacheKey)
+type bucketAccess struct {
+	Credentials aws.CredentialsProvider
+	S3Bucket    string
+}
 
-	if cacheData != nil {
-		return cacheData.(aws.CredentialsProvider), nil
+func getBucketAccess(bucketId string) (*bucketAccess, error) {
+	if bucketId == "" {
+		return nil, errors.New("bucket id is required")
 	}
 
-	body, err := utils.Garage.Fetch("/v2/GetBucketInfo?globalAlias="+bucket, &utils.FetchOptions{})
+	cacheKey := fmt.Sprintf("bucket-access:%s", bucketId)
+	cacheData := utils.Cache.Get(cacheKey)
+	if cacheData != nil {
+		return cacheData.(*bucketAccess), nil
+	}
+
+	body, err := utils.Garage.Fetch("/v2/GetBucketInfo?id="+bucketId, &utils.FetchOptions{})
 	if err != nil {
 		return nil, err
 	}
@@ -303,11 +311,24 @@ func getBucketCredentials(bucket string) (aws.CredentialsProvider, error) {
 	}
 
 	var key schema.KeyElement
+	bucket := ""
+	if len(bucketData.GlobalAliases) > 0 {
+		bucket = bucketData.GlobalAliases[0]
+	}
 
+	found := false
 	for _, k := range bucketData.Keys {
 		if !k.Permissions.Read || !k.Permissions.Write {
 			continue
 		}
+		// If no global alias, use local alias instead
+		if bucket == "" {
+			if len(k.BucketLocalAliases) == 0 {
+				continue
+			}
+			bucket = k.BucketLocalAliases[0]
+		}
+		found = true
 
 		body, err := utils.Garage.Fetch(fmt.Sprintf("/v2/GetKeyInfo?id=%s&showSecretKey=true", k.AccessKeyID), &utils.FetchOptions{})
 		if err != nil {
@@ -318,17 +339,25 @@ func getBucketCredentials(bucket string) (aws.CredentialsProvider, error) {
 		}
 		break
 	}
+	if !found {
+		return nil, errors.New("no read-write key for bucket")
+	}
 
-	credential := credentials.NewStaticCredentialsProvider(key.AccessKeyID, key.SecretAccessKey, "")
-	utils.Cache.Set(cacheKey, credential, time.Hour)
-
-	return credential, nil
+	if bucket == "" {
+		return nil, errors.New("bucket has no alias")
+	}
+	access := &bucketAccess{
+		Credentials: credentials.NewStaticCredentialsProvider(key.AccessKeyID, key.SecretAccessKey, ""),
+		S3Bucket:    bucket,
+	}
+	utils.Cache.Set(cacheKey, access, time.Hour)
+	return access, nil
 }
 
-func getS3Client(bucket string) (*s3.Client, error) {
-	creds, err := getBucketCredentials(bucket)
+func getS3Client(bucketId string) (*s3.Client, string, error) {
+	access, err := getBucketAccess(bucketId)
 	if err != nil {
-		return nil, fmt.Errorf("cannot get credentials for bucket %s: %w", bucket, err)
+		return nil, "", fmt.Errorf("cannot get credentials for bucket %s: %w", bucketId, err)
 	}
 
 	// Determine endpoint and whether to disable HTTPS
@@ -337,7 +366,7 @@ func getS3Client(bucket string) (*s3.Client, error) {
 
 	// AWS config without BaseEndpoint
 	awsConfig := aws.Config{
-		Credentials: creds,
+		Credentials: access.Credentials,
 		Region:      utils.Garage.GetS3Region(),
 	}
 
@@ -353,5 +382,5 @@ func getS3Client(bucket string) (*s3.Client, error) {
 		})
 	})
 
-	return client, nil
+	return client, access.S3Bucket, nil
 }

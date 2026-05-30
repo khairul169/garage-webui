@@ -17,14 +17,14 @@ type Props = {
 };
 
 const ObjectActions = ({ prefix = "", object, end }: Props) => {
-  const { bucketName } = useBucketContext();
+  const { bucket } = useBucketContext();
   const queryClient = useQueryClient();
   const isDirectory = object.objectKey.endsWith("/");
 
-  const deleteObject = useDeleteObject(bucketName, {
+  const deleteObject = useDeleteObject(bucket.id, {
     onSuccess: () => {
       toast.success("Object deleted!");
-      queryClient.invalidateQueries({ queryKey: ["browse", bucketName] });
+      queryClient.invalidateQueries({ queryKey: ["browse", bucket.id] });
     },
     onError: handleError,
   });
