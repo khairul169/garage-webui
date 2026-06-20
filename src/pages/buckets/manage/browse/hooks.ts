@@ -26,17 +26,9 @@ export const usePutObject = (
   options?: UseMutationOptions<any, Error, PutObjectPayload>
 ) => {
   return useMutation({
-    mutationFn: async (body) => {
+    mutationFn: ({ key }) => {
       const formData = new FormData();
-      if (body.file) {
-        formData.append("file", body.file);
-        const handle = api.upload(`/browse/${bucket}/${body.key}`, formData, {
-          onProgress: body.onProgress,
-        });
-        return handle.promise;
-      }
-
-      return api.put(`/browse/${bucket}/${body.key}`, { body: formData });
+      return api.put(`/browse/${bucket}/${key}`, { body: formData });
     },
     ...options,
   });

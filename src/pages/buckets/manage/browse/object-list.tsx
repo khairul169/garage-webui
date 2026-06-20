@@ -74,14 +74,8 @@ const ObjectList = ({ prefix, onPrefixChange }: Props) => {
             </tr>
           ) : null}
 
-          {uploadItems.map((item, idx) => (
-            <UploadRow
-              key={item.id}
-              item={item}
-              end={
-                idx >= uploadItems.length - 2 && uploadItems.length > 5
-              }
-            />
+          {uploadItems.map((item) => (
+            <UploadRow key={item.id} item={item} />
           ))}
 
           {data?.prefixes.map((prefix) => (

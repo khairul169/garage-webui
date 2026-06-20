@@ -79,7 +79,7 @@ const CreateFolderAction = ({ prefix }: CreateFolderActionProps) => {
   });
 
   const onSubmit = form.handleSubmit((values) => {
-    createFolder.mutate({ key: `${prefix}${values.name}/`, file: null });
+    createFolder.mutate({ key: `${prefix}${values.name}/` });
   });
 
   return (

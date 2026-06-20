@@ -1,10 +1,9 @@
-//#region 常量/配置
+import { APIError } from "@/lib/api";
 
 const CHUNK_SIZE = 512 * 1024;
-
-//#endregion
-
-//#region 模型/类型
+const DEFAULT_UPLOAD_TIMEOUT_MS = 3_600_000;
+const PAUSE_POLL_MS = 80;
+const MAX_UPLOAD_PERCENT_BEFORE_FINISH = 95;
 
 type StreamPhase = "header" | "body" | "footer";
 
@@ -14,11 +13,6 @@ type PausableStreamState = {
   offset: number;
 };
 
-export type PausableUploadProgress = {
-  percent: number;
-  phase: "uploading" | "finishing";
-};
-
 export type PausableUploadHandle<T = unknown> = {
   promise: Promise<T>;
   pause: () => void;
@@ -26,12 +20,29 @@ export type PausableUploadHandle<T = unknown> = {
   abort: () => void;
 };
 
-//#endregion
+type UploadProgressEvent = {
+  percent: number;
+  phase: "uploading" | "finishing";
+};
 
-//#region 方法/工具
+type StartPausableUploadOptions = {
+  onProgress?: (event: UploadProgressEvent) => void;
+  timeoutMs?: number;
+  onUnauthorized?: () => void;
+};
 
 const escapeMultipartFilename = (name: string) =>
   name.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+
+const abortStream = (controller: ReadableStreamDefaultController<Uint8Array>) => {
+  controller.error(new DOMException("Upload aborted", "AbortError"));
+};
+
+const waitWhilePaused = async (state: PausableStreamState) => {
+  while (state.paused && !state.aborted) {
+    await new Promise((resolve) => setTimeout(resolve, PAUSE_POLL_MS));
+  }
+};
 
 const createMultipartFileStream = (
   file: File,
@@ -48,23 +59,16 @@ const createMultipartFileStream = (
   const footer = encoder.encode(`\r\n--${boundary}--\r\n`);
   let phase: StreamPhase = "header";
 
-  const waitWhilePaused = async () => {
-    while (state.paused && !state.aborted) {
-      await new Promise((resolve) => setTimeout(resolve, 80));
-    }
-  };
-
   return new ReadableStream<Uint8Array>({
     async pull(controller) {
       if (state.aborted) {
-        controller.error(new DOMException("Upload aborted", "AbortError"));
+        abortStream(controller);
         return;
       }
 
-      await waitWhilePaused();
-
+      await waitWhilePaused(state);
       if (state.aborted) {
-        controller.error(new DOMException("Upload aborted", "AbortError"));
+        abortStream(controller);
         return;
       }
 
@@ -77,9 +81,9 @@ const createMultipartFileStream = (
 
       if (phase === "body") {
         if (state.offset < file.size) {
-          await waitWhilePaused();
+          await waitWhilePaused(state);
           if (state.aborted) {
-            controller.error(new DOMException("Upload aborted", "AbortError"));
+            abortStream(controller);
             return;
           }
 
@@ -102,18 +106,31 @@ const createMultipartFileStream = (
   });
 };
 
-//#endregion
+const parseUploadResponse = async (res: Response) => {
+  const contentType = res.headers.get("Content-Type") || "";
+  const isJson = contentType.includes("application/json");
+  const data = isJson ? await res.json() : await res.text();
 
-//#region 公开 API
+  if (res.status === 401) {
+    throw new APIError("unauthorized", 401);
+  }
+
+  if (!res.ok) {
+    const message = isJson
+      ? (data as { message?: string })?.message
+      : typeof data === "string"
+      ? data
+      : res.statusText;
+    throw new APIError(message || res.statusText, res.status);
+  }
+
+  return data;
+};
 
 export const startPausableUpload = <T = unknown>(
   url: string,
   file: File,
-  options?: {
-    onProgress?: (event: PausableUploadProgress) => void;
-    timeoutMs?: number;
-    onUnauthorized?: () => void;
-  }
+  options?: StartPausableUploadOptions
 ): PausableUploadHandle<T> => {
   const boundary = `----GarageUpload${Math.random().toString(36).slice(2, 12)}`;
   const state: PausableStreamState = {
@@ -122,7 +139,7 @@ export const startPausableUpload = <T = unknown>(
     offset: 0,
   };
   const abortController = new AbortController();
-  const timeoutMs = options?.timeoutMs ?? 3_600_000;
+  const timeoutMs = options?.timeoutMs ?? DEFAULT_UPLOAD_TIMEOUT_MS;
   let bodyFinished = false;
 
   const timeoutId = window.setTimeout(() => {
@@ -142,7 +159,7 @@ export const startPausableUpload = <T = unknown>(
     const sentPercent = Math.round((sent / total) * 100);
     options?.onProgress?.({
       phase: "uploading",
-      percent: Math.min(95, sentPercent),
+      percent: Math.min(MAX_UPLOAD_PERCENT_BEFORE_FINISH, sentPercent),
     });
   });
 
@@ -159,25 +176,14 @@ export const startPausableUpload = <T = unknown>(
     .then(async (res) => {
       window.clearTimeout(timeoutId);
 
-      const contentType = res.headers.get("Content-Type") || "";
-      const isJson = contentType.includes("application/json");
-      const data = isJson ? await res.json() : await res.text();
-
-      if (res.status === 401) {
-        options?.onUnauthorized?.();
-        throw new Error("unauthorized");
+      try {
+        return (await parseUploadResponse(res)) as T;
+      } catch (error) {
+        if (error instanceof APIError && error.status === 401) {
+          options?.onUnauthorized?.();
+        }
+        throw error;
       }
-
-      if (!res.ok) {
-        const message = isJson
-          ? (data as { message?: string })?.message
-          : typeof data === "string"
-          ? data
-          : res.statusText;
-        throw new Error(message || res.statusText);
-      }
-
-      return data as T;
     })
     .catch((error) => {
       window.clearTimeout(timeoutId);
@@ -198,5 +204,3 @@ export const startPausableUpload = <T = unknown>(
     },
   };
 };
-
-//#endregion

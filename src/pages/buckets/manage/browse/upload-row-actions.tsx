@@ -5,10 +5,9 @@ import { useUploadQueue } from "./upload-queue";
 
 type Props = {
   item: UploadRowItem;
-  end?: boolean;
 };
 
-const UploadRowActions = ({ item, end: _end }: Props) => {
+const UploadRowActions = ({ item }: Props) => {
   const { pauseUpload, resumeUpload, cancelUpload } = useUploadQueue();
   const isPaused = item.status === "paused";
   const isActive = item.status === "uploading" || item.status === "finishing";

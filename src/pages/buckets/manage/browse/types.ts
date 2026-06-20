@@ -18,11 +18,6 @@ export type Object = {
   url: string;
 };
 
-export type UploadProgressEvent = {
-  percent: number;
-  phase: "uploading" | "finishing";
-};
-
 export type UploadRowPhase = "uploading" | "finishing" | "paused";
 
 export type UploadRowStatus =
@@ -46,6 +41,4 @@ export type UploadRowItem = {
 
 export type PutObjectPayload = {
   key: string;
-  file: File | null;
-  onProgress?: (event: UploadProgressEvent) => void;
 };

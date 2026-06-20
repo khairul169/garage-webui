@@ -8,9 +8,10 @@ import {
   type ReactNode,
 } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { APIError, API_URL } from "@/lib/api";
+import { API_URL } from "@/lib/api";
 import { startPausableUpload } from "@/lib/pausable-upload";
-import * as utils from "@/lib/utils";
+import { url } from "@/lib/utils";
+import { toUploadErrorMessage } from "./upload-status";
 import {
   UploadRowItem,
   UploadRowPhase,
@@ -39,19 +40,25 @@ const createUploadId = () =>
     ? crypto.randomUUID()
     : `upload-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
-const toUploadErrorMessage = (error: unknown) => {
-  if (error instanceof DOMException && error.name === "AbortError") return null;
-  if (error instanceof APIError) {
-    if (error.status === 0) return "Network error. Check your connection.";
-    if (error.status === 413) return "File exceeds the server upload size limit.";
-    if (error.status === 502 || error.status === 504) {
-      return "Server timed out while saving. Retry or use the S3 API for large files.";
-    }
-    if (error.message) return error.message;
-  }
-  if (error instanceof Error && error.message) return error.message;
-  return "Upload failed.";
-};
+const progressToStatus = (phase: UploadRowPhase): UploadRowStatus =>
+  phase === "finishing" ? "finishing" : "uploading";
+
+const createUploadItem = (
+  id: string,
+  bucket: string,
+  prefix: string,
+  file: File
+): UploadRowItem => ({
+  id,
+  bucket,
+  prefix,
+  key: prefix + file.name,
+  fileName: file.name,
+  size: file.size,
+  percent: 0,
+  phase: "uploading",
+  status: "uploading",
+});
 
 export const UploadQueueProvider = ({ children }: { children: ReactNode }) => {
   const queryClient = useQueryClient();
@@ -76,28 +83,28 @@ export const UploadQueueProvider = ({ children }: { children: ReactNode }) => {
 
   const runUpload = useCallback(
     (id: string, bucket: string, key: string, file: File) => {
-      const url = `${API_URL}/browse/${bucket}/${key}`;
       let lastEventKey = "";
 
-      const handle = startPausableUpload(url, file, {
-        onUnauthorized: () => {
-          window.location.href = utils.url("/auth/login");
-        },
-        onProgress: (event) => {
-          const eventKey = `${event.phase}:${event.percent}`;
-          if (eventKey === lastEventKey) return;
-          lastEventKey = eventKey;
+      const handle = startPausableUpload(
+        `${API_URL}/browse/${bucket}/${key}`,
+        file,
+        {
+          onUnauthorized: () => {
+            window.location.href = url("/auth/login");
+          },
+          onProgress: (event) => {
+            const eventKey = `${event.phase}:${event.percent}`;
+            if (eventKey === lastEventKey) return;
+            lastEventKey = eventKey;
 
-          const status: UploadRowStatus =
-            event.phase === "finishing" ? "finishing" : "uploading";
-
-          patchItem(id, {
-            percent: event.percent,
-            phase: event.phase as UploadRowPhase,
-            status,
-          });
-        },
-      });
+            patchItem(id, {
+              percent: event.percent,
+              phase: event.phase as UploadRowPhase,
+              status: progressToStatus(event.phase as UploadRowPhase),
+            });
+          },
+        }
+      );
 
       activeRef.current.set(id, {
         pause: handle.pause,
@@ -121,10 +128,7 @@ export const UploadQueueProvider = ({ children }: { children: ReactNode }) => {
           const message = toUploadErrorMessage(error);
           if (!message) return;
 
-          patchItem(id, {
-            status: "error",
-            errorMessage: message,
-          });
+          patchItem(id, { status: "error", errorMessage: message });
         });
     },
     [patchItem, queryClient, removeItem]
@@ -134,24 +138,8 @@ export const UploadQueueProvider = ({ children }: { children: ReactNode }) => {
     (bucket: string, prefix: string, files: File[]) => {
       for (const file of files) {
         const id = createUploadId();
-        const key = prefix + file.name;
-
-        setItems((prev) => [
-          ...prev,
-          {
-            id,
-            bucket,
-            prefix,
-            key,
-            fileName: file.name,
-            size: file.size,
-            percent: 0,
-            phase: "uploading",
-            status: "uploading",
-          },
-        ]);
-
-        runUpload(id, bucket, key, file);
+        setItems((prev) => [...prev, createUploadItem(id, bucket, prefix, file)]);
+        runUpload(id, bucket, prefix + file.name, file);
       }
     },
     [runUpload]
@@ -163,10 +151,7 @@ export const UploadQueueProvider = ({ children }: { children: ReactNode }) => {
       if (!active) return;
 
       active.pause();
-      patchItem(id, {
-        status: "paused",
-        phase: "paused",
-      });
+      patchItem(id, { status: "paused", phase: "paused" });
     },
     [patchItem]
   );
@@ -174,7 +159,7 @@ export const UploadQueueProvider = ({ children }: { children: ReactNode }) => {
   const resumeUpload = useCallback(
     (id: string) => {
       const active = activeRef.current.get(id);
-      const item = items.find((i) => i.id === id);
+      const item = items.find((entry) => entry.id === id);
       if (!active || !item || item.status !== "paused") return;
 
       patchItem(id, {
@@ -189,7 +174,7 @@ export const UploadQueueProvider = ({ children }: { children: ReactNode }) => {
 
   const cancelUpload = useCallback(
     (id: string) => {
-      const item = items.find((i) => i.id === id);
+      const item = items.find((entry) => entry.id === id);
       if (!item) return;
 
       if (
@@ -202,11 +187,8 @@ export const UploadQueueProvider = ({ children }: { children: ReactNode }) => {
 
       cancelledRef.current.add(id);
       const active = activeRef.current.get(id);
-      if (active) {
-        active.abort();
-      } else {
-        removeItem(id);
-      }
+      if (active) active.abort();
+      else removeItem(id);
     },
     [items, removeItem]
   );
