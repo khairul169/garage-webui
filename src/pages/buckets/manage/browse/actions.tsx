@@ -1,8 +1,7 @@
 import { FolderPlus, UploadIcon } from "lucide-react";
 import Button from "@/components/ui/button";
-import { usePutObject } from "./hooks";
 import { toast } from "sonner";
-import { handleError } from "@/lib/utils";
+import { handleError, openFilePicker } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { useBucketContext } from "../context";
 import { useDisclosure } from "@/hooks/useDisclosure";
@@ -12,6 +11,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { InputField } from "@/components/ui/input";
 import { useEffect } from "react";
+import { usePutObject } from "./hooks";
+import { useUploadQueue } from "./upload-queue";
 
 type Props = {
   prefix: string;
@@ -19,53 +20,32 @@ type Props = {
 
 const Actions = ({ prefix }: Props) => {
   const { bucketName } = useBucketContext();
-  const queryClient = useQueryClient();
-
-  const putObject = usePutObject(bucketName, {
-    onSuccess: () => {
-      toast.success("File uploaded!");
-      queryClient.invalidateQueries({ queryKey: ["browse", bucketName] });
-    },
-    onError: handleError,
-  });
+  const { enqueueFiles } = useUploadQueue();
 
   const onUploadFile = () => {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.multiple = true;
-
-    input.onchange = (e) => {
-      const files = (e.target as HTMLInputElement).files;
-      if (!files?.length) {
-        return;
-      }
-
+    openFilePicker((files) => {
       if (files.length > 20) {
         toast.error("You can only upload up to 20 files at a time");
         return;
       }
 
-      for (const file of files) {
-        const key = prefix + file.name;
-        putObject.mutate({ key, file });
-      }
-    };
-
-    input.click();
-    input.remove();
+      enqueueFiles(
+        bucketName,
+        prefix,
+        Array.from(files)
+      );
+    }, { multiple: true });
   };
 
   return (
     <>
       <CreateFolderAction prefix={prefix} />
-      {/* <Button icon={FilePlus} color="ghost" /> */}
       <Button
         icon={UploadIcon}
         color="ghost"
         title="Upload File"
         onClick={onUploadFile}
       />
-      {/* <Button icon={EllipsisVertical} color="ghost" /> */}
     </>
   );
 };
@@ -99,7 +79,7 @@ const CreateFolderAction = ({ prefix }: CreateFolderActionProps) => {
   });
 
   const onSubmit = form.handleSubmit((values) => {
-    createFolder.mutate({ key: `${prefix}${values.name}/`, file: null });
+    createFolder.mutate({ key: `${prefix}${values.name}/` });
   });
 
   return (

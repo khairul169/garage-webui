@@ -18,7 +18,27 @@ export type Object = {
   url: string;
 };
 
+export type UploadRowPhase = "uploading" | "finishing" | "paused";
+
+export type UploadRowStatus =
+  | "uploading"
+  | "paused"
+  | "finishing"
+  | "error";
+
+export type UploadRowItem = {
+  id: string;
+  bucket: string;
+  prefix: string;
+  key: string;
+  fileName: string;
+  size: number;
+  percent: number;
+  phase: UploadRowPhase;
+  status: UploadRowStatus;
+  errorMessage?: string;
+};
+
 export type PutObjectPayload = {
   key: string;
-  file: File | null;
 };

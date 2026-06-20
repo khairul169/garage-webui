@@ -13,6 +13,7 @@ import PermissionsTab from "./permissions/permissions-tab";
 import MenuButton from "./components/menu-button";
 import BrowseTab from "./browse/browse-tab";
 import { BucketContext } from "./context";
+import { UploadQueueProvider } from "./browse/upload-queue";
 import { Alert, Loading } from "react-daisyui";
 
 const tabs: Tab[] = [
@@ -67,7 +68,9 @@ const ManageBucketPage = () => {
           <BucketContext.Provider
             value={{ bucket: data, refetch, bucketName: name || "" }}
           >
-            <TabView tabs={tabs} className="bg-base-100 h-14 px-1.5" />
+            <UploadQueueProvider>
+              <TabView tabs={tabs} className="bg-base-100 h-14 px-1.5" />
+            </UploadQueueProvider>
           </BucketContext.Provider>
         </div>
       )}
