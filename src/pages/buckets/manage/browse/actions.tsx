@@ -2,7 +2,7 @@ import { FolderPlus, UploadIcon } from "lucide-react";
 import Button from "@/components/ui/button";
 import { usePutObject } from "./hooks";
 import { toast } from "sonner";
-import { handleError } from "@/lib/utils";
+import { handleError, openFilePicker } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { useBucketContext } from "../context";
 import { useDisclosure } from "@/hooks/useDisclosure";
@@ -30,16 +30,7 @@ const Actions = ({ prefix }: Props) => {
   });
 
   const onUploadFile = () => {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.multiple = true;
-
-    input.onchange = (e) => {
-      const files = (e.target as HTMLInputElement).files;
-      if (!files?.length) {
-        return;
-      }
-
+    openFilePicker((files) => {
       if (files.length > 20) {
         toast.error("You can only upload up to 20 files at a time");
         return;
@@ -49,10 +40,7 @@ const Actions = ({ prefix }: Props) => {
         const key = prefix + file.name;
         putObject.mutate({ key, file });
       }
-    };
-
-    input.click();
-    input.remove();
+    }, { multiple: true });
   };
 
   return (
