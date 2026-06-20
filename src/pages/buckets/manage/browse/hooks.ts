@@ -30,6 +30,10 @@ export const usePutObject = (
       const formData = new FormData();
       if (body.file) {
         formData.append("file", body.file);
+        const handle = api.upload(`/browse/${bucket}/${body.key}`, formData, {
+          onProgress: body.onProgress,
+        });
+        return handle.promise;
       }
 
       return api.put(`/browse/${bucket}/${body.key}`, { body: formData });

@@ -14,7 +14,11 @@ const App = () => {
       <QueryClientProvider client={queryClient}>
         <Router />
       </QueryClientProvider>
-      <Toaster richColors />
+      <Toaster
+        expand={false}
+        gap={10}
+        toastOptions={{ className: "garage-toast-host" }}
+      />
       <ThemeProvider />
     </PageContextProvider>
   );

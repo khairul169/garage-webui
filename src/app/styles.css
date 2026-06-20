@@ -36,4 +36,9 @@
   .modal-backdrop {
     @apply border-none outline-none;
   }
+
+  /* Sonner — follow daisyUI theme tokens. */
+  [data-sonner-toaster] [data-sonner-toast].garage-toast-host {
+    @apply bg-base-100 text-base-content border border-base-300 shadow-lg;
+  }
 }

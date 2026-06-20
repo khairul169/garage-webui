@@ -1,6 +1,5 @@
 import { FolderPlus, UploadIcon } from "lucide-react";
 import Button from "@/components/ui/button";
-import { usePutObject } from "./hooks";
 import { toast } from "sonner";
 import { handleError, openFilePicker } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
@@ -12,6 +11,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { InputField } from "@/components/ui/input";
 import { useEffect } from "react";
+import { usePutObject } from "./hooks";
+import { useUploadQueue } from "./upload-queue";
 
 type Props = {
   prefix: string;
@@ -19,15 +20,7 @@ type Props = {
 
 const Actions = ({ prefix }: Props) => {
   const { bucketName } = useBucketContext();
-  const queryClient = useQueryClient();
-
-  const putObject = usePutObject(bucketName, {
-    onSuccess: () => {
-      toast.success("File uploaded!");
-      queryClient.invalidateQueries({ queryKey: ["browse", bucketName] });
-    },
-    onError: handleError,
-  });
+  const { enqueueFiles } = useUploadQueue();
 
   const onUploadFile = () => {
     openFilePicker((files) => {
@@ -36,24 +29,23 @@ const Actions = ({ prefix }: Props) => {
         return;
       }
 
-      for (const file of files) {
-        const key = prefix + file.name;
-        putObject.mutate({ key, file });
-      }
+      enqueueFiles(
+        bucketName,
+        prefix,
+        Array.from(files)
+      );
     }, { multiple: true });
   };
 
   return (
     <>
       <CreateFolderAction prefix={prefix} />
-      {/* <Button icon={FilePlus} color="ghost" /> */}
       <Button
         icon={UploadIcon}
         color="ghost"
         title="Upload File"
         onClick={onUploadFile}
       />
-      {/* <Button icon={EllipsisVertical} color="ghost" /> */}
     </>
   );
 };

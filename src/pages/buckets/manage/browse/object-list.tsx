@@ -14,6 +14,8 @@ import {
 import { useBucketContext } from "../context";
 import ObjectActions from "./object-actions";
 import GotoTopButton from "@/components/ui/goto-top-btn";
+import { useUploadQueue } from "./upload-queue";
+import UploadRow from "./upload-row";
 
 type Props = {
   prefix?: string;
@@ -22,10 +24,17 @@ type Props = {
 
 const ObjectList = ({ prefix, onPrefixChange }: Props) => {
   const { bucketName } = useBucketContext();
+  const { getItemsForLocation } = useUploadQueue();
+  const uploadItems = getItemsForLocation(bucketName, prefix || "");
+
   const { data, error, isLoading } = useBrowseObjects(bucketName, {
     prefix,
     limit: 1000,
   });
+
+  const hasServerObjects =
+    (data?.prefixes?.length ?? 0) > 0 || (data?.objects?.length ?? 0) > 0;
+  const showEmpty = !isLoading && !error && !hasServerObjects && uploadItems.length === 0;
 
   const onObjectClick = (object: Object) => {
     window.open(API_URL + object.url + "?view=1", "_blank");
@@ -57,13 +66,23 @@ const ObjectList = ({ prefix, onPrefixChange }: Props) => {
                 </Alert>
               </td>
             </tr>
-          ) : !data?.prefixes?.length && !data?.objects?.length ? (
+          ) : showEmpty ? (
             <tr>
               <td className="text-center py-16" colSpan={3}>
                 No objects
               </td>
             </tr>
           ) : null}
+
+          {uploadItems.map((item, idx) => (
+            <UploadRow
+              key={item.id}
+              item={item}
+              end={
+                idx >= uploadItems.length - 2 && uploadItems.length > 5
+              }
+            />
+          ))}
 
           {data?.prefixes.map((prefix) => (
             <tr
@@ -106,10 +125,14 @@ const ObjectList = ({ prefix, onPrefixChange }: Props) => {
                   role="button"
                   onClick={() => onObjectClick(object)}
                 >
-                  <span className="flex items-center font-normal w-full">
+                  <span className="flex items-center font-normal w-full min-w-0">
                     <FilePreview ext={ext?.substring(1)} object={object} />
-                    <span className="truncate max-w-[40vw]">{filename}</span>
-                    {ext && <span className="text-base-content/60">{ext}</span>}
+                    <span className="truncate min-w-0" title={object.objectKey}>
+                      {filename}
+                    </span>
+                    {ext && (
+                      <span className="text-base-content/60 shrink-0">{ext}</span>
+                    )}
                   </span>
                 </td>
                 <td className="whitespace-nowrap">
