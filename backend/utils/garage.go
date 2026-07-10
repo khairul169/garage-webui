@@ -8,7 +8,9 @@ import (
 	"io"
 	"khairul169/garage-webui/schema"
 	"log"
+	"net"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 
@@ -72,6 +74,64 @@ func (g *garage) GetS3Endpoint() string {
 	}
 
 	return endpoint
+}
+
+func (g *garage) GetS3WebEndpoint() string {
+	endpoint := os.Getenv("S3_WEB_ENDPOINT_URL")
+	if len(endpoint) > 0 {
+		return endpoint
+	}
+
+	port := endpointPort(g.Config.S3Web.BindAddr, "3902")
+	for _, candidate := range []string{
+		os.Getenv("S3_ENDPOINT_URL"),
+		os.Getenv("API_BASE_URL"),
+		g.Config.RPCPublicAddr,
+	} {
+		host, scheme := endpointHost(candidate)
+		if host == "" || isTemplateValue(host) {
+			continue
+		}
+
+		return fmt.Sprintf("%s://%s", scheme, net.JoinHostPort(host, port))
+	}
+
+	return ""
+}
+
+func endpointHost(endpoint string) (string, string) {
+	if endpoint == "" {
+		return "", "http"
+	}
+
+	scheme := "http"
+	value := endpoint
+	if !strings.Contains(value, "://") {
+		value = "//" + value
+	}
+
+	parsed, err := url.Parse(value)
+	if err != nil {
+		return "", scheme
+	}
+	if parsed.Scheme != "" {
+		scheme = parsed.Scheme
+	}
+
+	return parsed.Hostname(), scheme
+}
+
+func endpointPort(bindAddr string, defaultPort string) string {
+	_, port, err := net.SplitHostPort(bindAddr)
+	if err == nil && port != "" {
+		return port
+	}
+
+	return defaultPort
+}
+
+func isTemplateValue(value string) bool {
+	return strings.HasPrefix(value, "__") && strings.HasSuffix(value, "__")
 }
 
 func (g *garage) GetS3Region() string {

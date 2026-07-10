@@ -55,6 +55,7 @@ services:
     environment:
       API_BASE_URL: "http://garage:3903"
       S3_ENDPOINT_URL: "http://garage:3900"
+      S3_WEB_ENDPOINT_URL: "http://garage:3902"
 ```
 
 ### Without Docker
@@ -148,6 +149,7 @@ Configurable envs:
 - `API_ADMIN_KEY`: Admin API key.
 - `S3_REGION`: S3 Region.
 - `S3_ENDPOINT_URL`: S3 Endpoint url.
+- `S3_WEB_ENDPOINT_URL`: Garage web endpoint used for anonymous reads of objects in buckets with website access enabled.
 
 ### Authentication
 

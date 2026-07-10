@@ -6,9 +6,12 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"khairul169/garage-webui/middleware"
 	"khairul169/garage-webui/schema"
 	"khairul169/garage-webui/utils"
 	"net/http"
+	"net/http/httputil"
+	"net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -81,6 +84,11 @@ func (b *Browse) GetObjects(w http.ResponseWriter, r *http.Request) {
 }
 
 func (b *Browse) GetOneObject(w http.ResponseWriter, r *http.Request) {
+	if !middleware.IsAuthenticated(r) {
+		b.getPublicObject(w, r)
+		return
+	}
+
 	bucket := r.PathValue("bucket")
 	key := r.PathValue("key")
 	queryParams := r.URL.Query()
@@ -167,6 +175,43 @@ func (b *Browse) GetOneObject(w http.ResponseWriter, r *http.Request) {
 		utils.ResponseError(w, err)
 		return
 	}
+}
+
+func (b *Browse) getPublicObject(w http.ResponseWriter, r *http.Request) {
+	target, err := url.Parse(utils.Garage.GetS3WebEndpoint())
+	if err != nil || target.Scheme == "" || target.Host == "" {
+		utils.ResponseErrorStatus(w, errors.New("invalid Garage web endpoint"), http.StatusBadGateway)
+		return
+	}
+
+	bucket := r.PathValue("bucket")
+	key := r.PathValue("key")
+	download := r.URL.Query().Get("dl") == "1"
+
+	proxy := &httputil.ReverseProxy{
+		Rewrite: func(proxyRequest *httputil.ProxyRequest) {
+			proxyRequest.Out.URL.Scheme = target.Scheme
+			proxyRequest.Out.URL.Host = target.Host
+			proxyRequest.Out.URL.Path = strings.TrimSuffix(target.Path, "/") + "/" + strings.TrimPrefix(key, "/")
+			proxyRequest.Out.URL.RawPath = ""
+			proxyRequest.Out.URL.RawQuery = ""
+			proxyRequest.Out.Host = bucket
+			proxyRequest.Out.Header.Del("Authorization")
+			proxyRequest.Out.Header.Del("Cookie")
+		},
+		ModifyResponse: func(response *http.Response) error {
+			if download && response.StatusCode >= 200 && response.StatusCode < 300 {
+				parts := strings.Split(key, "/")
+				response.Header.Set("Content-Disposition", fmt.Sprintf("attachment; filename=%q", parts[len(parts)-1]))
+			}
+			return nil
+		},
+		ErrorHandler: func(w http.ResponseWriter, _ *http.Request, err error) {
+			utils.ResponseErrorStatus(w, fmt.Errorf("cannot fetch public object: %w", err), http.StatusBadGateway)
+		},
+	}
+
+	proxy.ServeHTTP(w, r)
 }
 
 func (b *Browse) PutObject(w http.ResponseWriter, r *http.Request) {

@@ -42,7 +42,7 @@ const ShareDialog = () => {
         {!bucket.websiteAccess && (
           <Alert className="mb-4 items-start text-sm">
             <FileWarningIcon className="mt-1" />
-            Sharing is only available for buckets with enabled website access.
+            Sharing is only available when HTTP Access is set to Anonymous HTTP.
           </Alert>
         )}
         <div className="flex flex-row overflow-x-auto pb-2">
