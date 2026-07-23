@@ -10,7 +10,7 @@ services:
     ports:
       - 3900:3900
       - 3901:3901
-      - 3902:3903
+      - 3902:3902
       - 3903:3903
 
   webui:
@@ -24,3 +24,4 @@ services:
     environment:
       API_BASE_URL: "http://garage:3903"
       S3_ENDPOINT_URL: "http://garage:3900"
+      S3_WEB_ENDPOINT_URL: "http://garage:3902"

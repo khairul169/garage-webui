@@ -11,6 +11,10 @@ func HandleApiRouter() *http.ServeMux {
 	auth := &Auth{}
 	mux.HandleFunc("POST /auth/login", auth.Login)
 
+	browse := &Browse{}
+	mux.Handle("GET /browse/{bucket}", middleware.AuthMiddleware(http.HandlerFunc(browse.GetObjects)))
+	mux.HandleFunc("GET /browse/{bucket}/{key...}", browse.GetOneObject)
+
 	router := http.NewServeMux()
 	router.HandleFunc("POST /auth/logout", auth.Logout)
 	router.HandleFunc("GET /auth/status", auth.GetStatus)
@@ -21,9 +25,6 @@ func HandleApiRouter() *http.ServeMux {
 	buckets := &Buckets{}
 	router.HandleFunc("GET /buckets", buckets.GetAll)
 
-	browse := &Browse{}
-	router.HandleFunc("GET /browse/{bucket}", browse.GetObjects)
-	router.HandleFunc("GET /browse/{bucket}/{key...}", browse.GetOneObject)
 	router.HandleFunc("PUT /browse/{bucket}/{key...}", browse.PutObject)
 	router.HandleFunc("DELETE /browse/{bucket}/{key...}", browse.DeleteObject)
 

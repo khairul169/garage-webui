@@ -8,8 +8,14 @@ import { useConfig } from "@/hooks/useConfig";
 import { Info, LinkIcon } from "lucide-react";
 import Button from "@/components/ui/button";
 import { InputField } from "@/components/ui/input";
-import { ToggleField } from "@/components/ui/toggle";
 import { useBucketContext } from "../context";
+import FormControl from "@/components/ui/form-control";
+import Select from "@/components/ui/select";
+
+const accessOptions = [
+  { label: "Private (login required)", value: "private" },
+  { label: "Anonymous HTTP", value: "anonymous" },
+] as const;
 
 const WebsiteAccessSection = () => {
   const { bucket: data, bucketName } = useBucketContext();
@@ -17,7 +23,8 @@ const WebsiteAccessSection = () => {
   const form = useForm<WebsiteConfigSchema>({
     resolver: zodResolver(websiteConfigSchema),
   });
-  const isEnabled = useWatch({ control: form.control, name: "websiteAccess" });
+  const accessMode = useWatch({ control: form.control, name: "accessMode" });
+  const isAnonymous = accessMode === "anonymous";
 
   const websitePort = config?.s3_web?.bind_addr?.split(":").pop() || "80";
   const rootDomain = config?.s3_web?.root_domain;
@@ -25,24 +32,24 @@ const WebsiteAccessSection = () => {
   const updateMutation = useUpdateBucket(data?.id);
 
   const onChange = useDebounce((values: DeepPartial<WebsiteConfigSchema>) => {
-    const data = {
-      enabled: values.websiteAccess,
-      indexDocument: values.websiteAccess
+    const websiteAccess = {
+      enabled: values.accessMode === "anonymous",
+      indexDocument: values.accessMode === "anonymous"
         ? values.websiteConfig?.indexDocument
         : undefined,
-      errorDocument: values.websiteAccess
+      errorDocument: values.accessMode === "anonymous"
         ? values.websiteConfig?.errorDocument
         : undefined,
     };
 
     updateMutation.mutate({
-      websiteAccess: data,
+      websiteAccess,
     });
   });
 
   useEffect(() => {
     form.reset({
-      websiteAccess: data?.websiteAccess,
+      accessMode: data?.websiteAccess ? "anonymous" : "private",
       websiteConfig: {
         indexDocument: data?.websiteConfig?.indexDocument || "index.html",
         errorDocument: data?.websiteConfig?.errorDocument || "error/400.html",
@@ -56,7 +63,7 @@ const WebsiteAccessSection = () => {
   return (
     <div className="mt-8">
       <div className="flex flex-row gap-2">
-        <p className="label label-text py-0 grow-0">Website Access</p>
+        <p className="label label-text py-0 grow-0">HTTP Access</p>
         <Button
           href="https://garagehq.deuxfleurs.fr/documentation/cookbook/exposing-websites"
           target="_blank"
@@ -68,9 +75,25 @@ const WebsiteAccessSection = () => {
         </Button>
       </div>
 
-      <ToggleField form={form} name="websiteAccess" label="Enabled" />
+      <FormControl
+        form={form}
+        name="accessMode"
+        className="mt-2"
+        render={(field) => (
+          <Select
+            {...field}
+            value={accessOptions.find((option) => option.value === field.value)}
+            options={accessOptions}
+            onChange={(option) =>
+              field.onChange(
+                (option as { value?: "private" | "anonymous" } | null)?.value
+              )
+            }
+          />
+        )}
+      />
 
-      {isEnabled && (
+      {isAnonymous && (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <InputField

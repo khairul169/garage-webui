@@ -7,7 +7,7 @@ export const addAliasSchema = z.object({
 export type AddAliasSchema = z.infer<typeof addAliasSchema>;
 
 export const websiteConfigSchema = z.object({
-  websiteAccess: z.boolean(),
+  accessMode: z.enum(["private", "anonymous"]),
   websiteConfig: z
     .object({ indexDocument: z.string(), errorDocument: z.string() })
     .nullish(),
