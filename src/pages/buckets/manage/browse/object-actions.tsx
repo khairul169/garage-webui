@@ -30,7 +30,10 @@ const ObjectActions = ({ prefix = "", object, end }: Props) => {
   });
 
   const onDownload = () => {
-    window.open(API_URL + object.url + "?dl=1", "_blank");
+    const url = isDirectory
+      ? `/browse/${bucketName}/${prefix + object.objectKey}?zip=1`
+      : object.url + "?dl=1";
+    window.open(API_URL + url, "_blank");
   };
 
   const onDelete = () => {
@@ -51,9 +54,7 @@ const ObjectActions = ({ prefix = "", object, end }: Props) => {
   return (
     <td className="!p-0 w-auto">
       <span className="w-full flex flex-row justify-end pr-2">
-        {!isDirectory && (
-          <Button icon={DownloadIcon} color="ghost" onClick={onDownload} />
-        )}
+        <Button icon={DownloadIcon} color="ghost" onClick={onDownload} />
 
         <Dropdown end vertical={end ? "top" : "bottom"}>
           <Dropdown.Toggle button={false}>

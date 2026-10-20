@@ -1,6 +1,7 @@
 package router
 
 import (
+	"archive/zip"
 	"context"
 	"encoding/json"
 	"errors"
@@ -91,6 +92,11 @@ func (b *Browse) GetOneObject(w http.ResponseWriter, r *http.Request) {
 	client, err := getS3Client(bucket)
 	if err != nil {
 		utils.ResponseError(w, err)
+		return
+	}
+
+	if strings.HasSuffix(key, "/") && queryParams.Get("zip") == "1" {
+		streamZip(w, r.Context(), client, bucket, key)
 		return
 	}
 
@@ -282,6 +288,60 @@ func (b *Browse) DeleteObject(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.ResponseSuccess(w, res)
+}
+
+// streamZip writes every object under prefix into a zip streamed straight to the response,
+// so nothing is buffered in memory or on disk.
+func streamZip(w http.ResponseWriter, ctx context.Context, client *s3.Client, bucket, prefix string) {
+	parts := strings.Split(strings.TrimSuffix(prefix, "/"), "/")
+	name := parts[len(parts)-1]
+
+	w.Header().Set("Content-Type", "application/zip")
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%q", name+".zip"))
+
+	zw := zip.NewWriter(w)
+	defer zw.Close()
+
+	paginator := s3.NewListObjectsV2Paginator(client, &s3.ListObjectsV2Input{
+		Bucket: aws.String(bucket),
+		Prefix: aws.String(prefix),
+	})
+
+	for paginator.HasMorePages() {
+		page, err := paginator.NextPage(ctx)
+		if err != nil {
+			// Headers are already sent; abort so the client gets a truncated (invalid) zip.
+			panic(http.ErrAbortHandler)
+		}
+
+		for _, obj := range page.Contents {
+			rel := strings.TrimPrefix(*obj.Key, prefix)
+			if rel == "" || strings.HasSuffix(rel, "/") {
+				continue
+			}
+
+			body, err := client.GetObject(ctx, &s3.GetObjectInput{
+				Bucket: aws.String(bucket),
+				Key:    obj.Key,
+			})
+			if err != nil {
+				panic(http.ErrAbortHandler)
+			}
+
+			fw, err := zw.CreateHeader(&zip.FileHeader{
+				Name:     name + "/" + rel,
+				Method:   zip.Deflate,
+				Modified: aws.ToTime(obj.LastModified),
+			})
+			if err == nil {
+				_, err = io.Copy(fw, body.Body)
+			}
+			body.Body.Close()
+			if err != nil {
+				panic(http.ErrAbortHandler)
+			}
+		}
+	}
 }
 
 func getBucketCredentials(bucket string) (aws.CredentialsProvider, error) {
