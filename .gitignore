@@ -17,6 +17,9 @@ result
 result-*
 .direnv/
 
+# Local development data
+.dev/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -30,8 +33,10 @@ result-*
 
 .env*
 !.env.example
+!.envrc
 docker-compose.*.yml
 
 data/
 meta/
 garage.toml
+!dev/garage.toml

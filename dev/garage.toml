@@ -1,0 +1,24 @@
+# Local development configuration for Garage.
+#
+# Run Garage from the repository root so the relative paths below resolve
+# inside .dev/. `scripts/dev.sh` and `scripts/garage-dev.sh` do this for you.
+metadata_dir = ".dev/garage/meta"
+data_dir = ".dev/garage/data"
+db_engine = "sqlite"
+
+# A single-node development cluster does not need replication.
+replication_factor = 1
+
+rpc_bind_addr = "127.0.0.1:3901"
+rpc_public_addr = "127.0.0.1:3901"
+rpc_secret = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+
+[s3_api]
+s3_region = "garage"
+api_bind_addr = "127.0.0.1:3900"
+root_domain = ".s3.localhost"
+
+[admin]
+api_bind_addr = "127.0.0.1:3903"
+admin_token = "dev-admin-token"
+metrics_token = "dev-metrics-token"

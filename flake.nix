@@ -57,6 +57,11 @@
 
         # The Go backend, built in prod mode so the UI is embedded into the
         # binary via go:embed. The binary is the complete application.
+        clean = pkgs.writeShellScriptBin "clean" ''
+          export ROOT="$PWD"
+          exec ${pkgs.bash}/bin/bash ${./scripts/clean.sh} "$@"
+        '';
+
         garage-webui = pkgs.buildGoModule {
           pname = "garage-webui";
           inherit version;
@@ -87,13 +92,19 @@
           inherit frontend garage-webui;
         };
 
-        apps.default = flake-utils.lib.mkApp { drv = garage-webui; };
+        apps = {
+          default = flake-utils.lib.mkApp { drv = garage-webui; };
+          clean = {
+            type = "app";
+            program = "${clean}/bin/clean";
+          };
+        };
 
         devShells.default = pkgs.mkShell {
           packages = with pkgs; [
             air
             curl
-            garage
+            garage_2
             go
             gopls
             jq

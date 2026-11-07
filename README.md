@@ -120,7 +120,8 @@ $ CONFIG_PATH=./garage.toml nix run
 
 The flake exposes `packages.default`, `packages.garage-webui`, and a
 `devShells.default` with Go, Node.js, pnpm, Air, and Garage for local
-development.
+development. Use `nix run .#clean` to remove build output and local
+development state (add `-- --deps` to remove `node_modules` as well).
 
 ### Configuration
 
@@ -197,14 +198,50 @@ Once your instance of Garage Web UI is started, you can open the web UI at http:
 
 ## Development
 
-This project is bootstrapped using TypeScript & React for the UI, and Go for backend. If you want to build it yourself or add additional features, follow these steps:
+This project is bootstrapped using TypeScript & React for the UI, and Go for the backend. The easiest setup is the Nix flake, which provides the Go, Node.js, pnpm, Air, and Garage toolchain.
 
-### Setup
+### Nix development environment
+
+```sh
+$ nix develop
+$ pnpm install
+$ dev
+```
+
+`dev` starts a single-node Garage instance on ports 3900 (S3), 3901 (RPC), and 3903 (admin API), provisions the `garage-webui` bucket alias and `dev-key` access key, and then runs the Go API with live reload on port 3909 and Vite on port 5173.
+
+The local Garage data lives in `.dev/garage`. To stop it and remove all local development state, run:
+
+```sh
+$ nix run .#clean           # add -- --deps to also remove node_modules
+# or, inside nix develop:
+$ clean
+```
+
+Its development credentials are:
+
+- Admin token: `dev-admin-token`
+- Bucket alias: `garage-webui`
+- Key name: `dev-key` (run `scripts/garage-setup.sh` to print its ID and secret)
+
+To run the pieces separately, use:
+
+```sh
+$ scripts/garage-dev.sh      # run Garage in the foreground
+$ scripts/garage-setup.sh    # provision layout, key and bucket
+$ pnpm run dev:client        # Vite
+$ pnpm run dev:server        # Go API with Air
+```
+
+When starting the pieces manually, export `CONFIG_PATH=./dev/garage.toml` and the `API_BASE_URL`, `API_ADMIN_KEY`, and `S3_ENDPOINT_URL` values shown above.
+
+### Manual setup
+
+Without Nix, install Node.js, pnpm, Go, Air, and Garage yourself:
 
 ```sh
 $ git clone https://github.com/khairul169/garage-webui.git
 $ cd garage-webui && pnpm install
-$ cd backend && pnpm install && cd ..
 ```
 
 ### Running
