@@ -77,6 +77,12 @@
             cp -r ${frontend}/dist/. ui/dist/
           '';
 
+          checkPhase = ''
+            runHook preCheck
+            go test ./...
+            runHook postCheck
+          '';
+
           meta = with lib; {
             description = "Web UI for Garage object storage";
             homepage = "https://github.com/khairul169/garage-webui";
