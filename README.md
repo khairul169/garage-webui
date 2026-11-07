@@ -101,6 +101,27 @@ $ sudo systemctl daemon-reload
 $ sudo systemctl enable --now garage-webui
 ```
 
+### Nix
+
+A Nix flake is included for reproducible builds and development. It builds the
+UI with pnpm, embeds it into the Go backend, and produces a single
+`garage-webui` binary.
+
+```sh
+$ nix build
+$ CONFIG_PATH=./garage.toml ./result/bin/garage-webui
+```
+
+You can also build and run it in one step:
+
+```sh
+$ CONFIG_PATH=./garage.toml nix run
+```
+
+The flake exposes `packages.default`, `packages.garage-webui`, and a
+`devShells.default` with Go, Node.js, pnpm, Air, and Garage for local
+development.
+
 ### Configuration
 
 To simplify installation, the Garage Web UI uses values from the Garage configuration, such as `rpc_public_addr`, `admin.admin_token`, `s3_web.root_domain`, etc.
