@@ -228,45 +228,13 @@ func (b *Browse) DeleteObject(w http.ResponseWriter, r *http.Request) {
 
 	// Delete directory and its content
 	if isDirectory && recursive {
-		objects, err := client.ListObjectsV2(context.Background(), &s3.ListObjectsV2Input{
-			Bucket: aws.String(bucket),
-			Prefix: aws.String(key),
-		})
-
+		result, err := deleteDirectoryObjects(r.Context(), client, bucket, key)
 		if err != nil {
 			utils.ResponseError(w, err)
 			return
 		}
 
-		if len(objects.Contents) == 0 {
-			utils.ResponseSuccess(w, true)
-			return
-		}
-
-		keys := make([]types.ObjectIdentifier, 0, len(objects.Contents))
-
-		for _, object := range objects.Contents {
-			keys = append(keys, types.ObjectIdentifier{
-				Key: object.Key,
-			})
-		}
-
-		res, err := client.DeleteObjects(context.Background(), &s3.DeleteObjectsInput{
-			Bucket: aws.String(bucket),
-			Delete: &types.Delete{Objects: keys},
-		})
-
-		if err != nil {
-			utils.ResponseError(w, fmt.Errorf("cannot delete object: %w", err))
-			return
-		}
-
-		if len(res.Errors) > 0 {
-			utils.ResponseError(w, fmt.Errorf("cannot delete object: %v", res.Errors[0]))
-			return
-		}
-
-		utils.ResponseSuccess(w, res)
+		utils.ResponseSuccess(w, result)
 		return
 	}
 
@@ -282,6 +250,64 @@ func (b *Browse) DeleteObject(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.ResponseSuccess(w, res)
+}
+
+const deleteObjectsBatchSize = 1000
+
+func deleteDirectoryObjects(ctx context.Context, client *s3.Client, bucket, prefix string) (schema.DeleteObjectsResult, error) {
+	result := schema.DeleteObjectsResult{}
+	var continuationToken *string
+
+	for {
+		objects, err := client.ListObjectsV2(ctx, &s3.ListObjectsV2Input{
+			Bucket:            aws.String(bucket),
+			Prefix:            aws.String(prefix),
+			MaxKeys:           aws.Int32(deleteObjectsBatchSize),
+			ContinuationToken: continuationToken,
+		})
+		if err != nil {
+			return result, fmt.Errorf("cannot list objects: %w", err)
+		}
+
+		keys := make([]types.ObjectIdentifier, 0, len(objects.Contents))
+		for _, object := range objects.Contents {
+			if object.Key == nil {
+				continue
+			}
+			keys = append(keys, types.ObjectIdentifier{Key: object.Key})
+		}
+
+		if len(keys) > 0 {
+			res, err := client.DeleteObjects(ctx, &s3.DeleteObjectsInput{
+				Bucket: aws.String(bucket),
+				Delete: &types.Delete{Objects: keys},
+			})
+			if err != nil {
+				return result, fmt.Errorf("cannot delete objects: %w", err)
+			}
+
+			result.Deleted += len(keys) - len(res.Errors)
+			for _, deleteErr := range res.Errors {
+				result.Errors = append(result.Errors, schema.DeleteObjectsError{
+					Key:     aws.ToString(deleteErr.Key),
+					Code:    aws.ToString(deleteErr.Code),
+					Message: aws.ToString(deleteErr.Message),
+				})
+			}
+		}
+
+		if objects.IsTruncated == nil || !*objects.IsTruncated {
+			break
+		}
+
+		nextToken := objects.NextContinuationToken
+		if nextToken == nil || (continuationToken != nil && *nextToken == *continuationToken) {
+			break
+		}
+		continuationToken = nextToken
+	}
+
+	return result, nil
 }
 
 func getBucketCredentials(bucket string) (aws.CredentialsProvider, error) {

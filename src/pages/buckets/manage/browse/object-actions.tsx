@@ -1,5 +1,5 @@
 import { Dropdown } from "react-daisyui";
-import { Object } from "./types";
+import { DeleteObjectsResult, Object } from "./types";
 import Button from "@/components/ui/button";
 import { DownloadIcon, EllipsisVertical, Share2, Trash } from "lucide-react";
 import { useDeleteObject } from "./hooks";
@@ -22,8 +22,27 @@ const ObjectActions = ({ prefix = "", object, end }: Props) => {
   const isDirectory = object.objectKey.endsWith("/");
 
   const deleteObject = useDeleteObject(bucketName, {
-    onSuccess: () => {
-      toast.success("Object deleted!");
+    onSuccess: (data) => {
+      const result = data as DeleteObjectsResult;
+      if (typeof result.deleted === "number") {
+        const failures = result.errors ?? [];
+        if (failures.length > 0) {
+          const keys = failures
+            .map((error) => error.key)
+            .filter(Boolean)
+            .slice(0, 3)
+            .join(", ");
+          toast.warning(
+            `Deleted ${result.deleted} objects, but ${failures.length} failed` +
+              (keys ? ` (${keys})` : "") +
+              "."
+          );
+        } else {
+          toast.success(`Deleted ${result.deleted} objects!`);
+        }
+      } else {
+        toast.success("Object deleted!");
+      }
       queryClient.invalidateQueries({ queryKey: ["browse", bucketName] });
     },
     onError: handleError,
@@ -34,11 +53,12 @@ const ObjectActions = ({ prefix = "", object, end }: Props) => {
   };
 
   const onDelete = () => {
+    const objectPath = `${bucketName}/${prefix}${object.objectKey}`;
     if (
       window.confirm(
-        `Are you sure you want to delete this ${
-          isDirectory ? "directory and its content" : "object"
-        }?`
+        isDirectory
+          ? `Are you sure you want to delete the directory "${objectPath}" and all of its contents?`
+          : `Are you sure you want to delete "${objectPath}"?`
       )
     ) {
       deleteObject.mutate({
