@@ -15,3 +15,14 @@ type BrowserObject struct {
 	Size         *int64     `json:"size"`
 	Url          string     `json:"url"`
 }
+
+type DeleteObjectsResult struct {
+	Deleted int                  `json:"deleted"`
+	Errors  []DeleteObjectsError `json:"errors,omitempty"`
+}
+
+type DeleteObjectsError struct {
+	Key     string `json:"key,omitempty"`
+	Code    string `json:"code,omitempty"`
+	Message string `json:"message,omitempty"`
+}

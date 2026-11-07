@@ -5,6 +5,7 @@ import {
   useQuery,
 } from "@tanstack/react-query";
 import {
+  DeleteObjectResult,
   GetObjectsResult,
   PutObjectPayload,
   UseBrowserObjectOptions,
@@ -40,11 +41,15 @@ export const usePutObject = (
 
 export const useDeleteObject = (
   bucket: string,
-  options?: UseMutationOptions<any, Error, { key: string; recursive?: boolean }>
+  options?: UseMutationOptions<
+    DeleteObjectResult,
+    Error,
+    { key: string; recursive?: boolean }
+  >
 ) => {
   return useMutation({
     mutationFn: (data) =>
-      api.delete(`/browse/${bucket}/${data.key}`, {
+      api.delete<DeleteObjectResult>(`/browse/${bucket}/${data.key}`, {
         params: { recursive: data.recursive },
       }),
     ...options,
